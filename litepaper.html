@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DRONENAV — Litepaper v1.0</title>
+  <meta name="description" content="DRONENAV Litepaper — Platform overview, token economy, and growth strategy for the global drone exploration network."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --neon:    #00D4FF;
+      --neon2:   #0066FF;
+      --bg:      #0a0e1a;
+      --surface: #0f1629;
+      --surface2:#131c35;
+      --border:  rgba(0,212,255,0.15);
+      --border2: rgba(0,212,255,0.30);
+      --text:    #e8edf5;
+      --muted:   #8892a4;
+      --sidebar-w: 220px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── SCANLINES ── */
+    body::before {
+      content:'';
+      position: fixed; inset:0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.01) 2px, rgba(0,212,255,0.01) 4px);
+      pointer-events:none; z-index:0;
+    }
+
+    /* ── NAVBAR ── */
+    #navbar {
+      position: fixed; top:0; left:0; right:0;
+      height: 64px;
+      display: flex; align-items:center; justify-content:space-between;
+      padding: 0 32px;
+      background: linear-gradient(180deg, rgba(10,14,26,0.97) 0%, rgba(10,14,26,0) 100%);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      z-index: 200;
+    }
+    #logo {
+      display:flex; align-items:center; gap:10px;
+      font-family:'Orbitron',sans-serif; font-size:1.3rem; font-weight:900;
+      letter-spacing:0.12em; color:var(--neon);
+      text-shadow:0 0 20px rgba(0,212,255,0.6);
+      text-decoration:none;
+    }
+    #logo svg { width:32px; height:32px; }
+    nav { display:flex; align-items:center; gap:8px; }
+    nav a {
+      color:rgba(255,255,255,0.65); text-decoration:none;
+      font-size:0.8rem; font-weight:500; letter-spacing:0.08em;
+      text-transform:uppercase; padding:6px 16px;
+      border:1px solid transparent; border-radius:4px; transition:all 0.25s;
+    }
+    nav a:hover { color:var(--neon); border-color:var(--border); background:rgba(0,212,255,0.05); text-shadow:0 0 10px rgba(0,212,255,0.5); }
+    nav a.active { color:var(--neon); border-color:rgba(0,212,255,0.4); background:rgba(0,212,255,0.08); text-shadow:0 0 12px rgba(0,212,255,0.6); }
+    #hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:4px; }
+    #hamburger span { display:block; width:24px; height:2px; background:var(--neon); border-radius:2px; transition:all 0.3s; }
+
+    /* ── HERO ── */
+    #hero {
+      position: relative;
+      padding: 120px 32px 64px;
+      border-bottom: 1px solid var(--border);
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,212,255,0.07) 0%, transparent 70%);
+      z-index: 1;
+    }
+    .hero-top { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; max-width:1200px; margin:0 auto 32px; }
+
+    .hero-eyebrow {
+      font-family:'Orbitron',sans-serif; font-size:0.65rem; font-weight:600;
+      letter-spacing:0.3em; color:var(--neon); text-transform:uppercase;
+      margin-bottom:14px; opacity:0.8;
+    }
+    #hero h1 {
+      font-family:'Orbitron',sans-serif; font-size:clamp(2.4rem,5vw,4rem);
+      font-weight:900; letter-spacing:0.12em; color:#fff;
+      text-shadow:0 0 50px rgba(0,212,255,0.3); line-height:1;
+      margin-bottom:12px;
+    }
+    .hero-version {
+      font-size:0.78rem; color:var(--muted); letter-spacing:0.12em;
+      font-family:'Orbitron',sans-serif;
+    }
+    .btn-outline {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 22px;
+      border:1px solid var(--neon); border-radius:6px;
+      color:var(--neon); text-decoration:none;
+      font-family:'Orbitron',sans-serif; font-size:0.7rem; font-weight:700;
+      letter-spacing:0.1em; text-transform:uppercase;
+      transition:all 0.25s; background:transparent;
+      cursor:pointer;
+    }
+    .btn-outline:hover { background:rgba(0,212,255,0.08); box-shadow:0 0 20px rgba(0,212,255,0.2); }
+
+    /* ── LAYOUT ── */
+    #layout {
+      display: flex;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 32px 100px;
+      gap: 48px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── SIDEBAR ── */
+    #sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+    }
+    #sidebar-inner {
+      position: sticky;
+      top: 88px;
+      padding: 24px 0;
+    }
+    .sidebar-label {
+      font-family:'Orbitron',sans-serif; font-size:0.55rem; font-weight:700;
+      letter-spacing:0.2em; text-transform:uppercase; color:var(--muted);
+      margin-bottom:16px; padding-left:16px;
+    }
+    .sidebar-nav { list-style:none; }
+    .sidebar-nav a {
+      display: flex; align-items:center; gap:10px;
+      padding: 9px 16px;
+      font-size:0.8rem; font-weight:500; color:rgba(255,255,255,0.45);
+      text-decoration:none; border-radius:6px; letter-spacing:0.04em;
+      transition: all 0.2s; position:relative;
+      border-left: 2px solid transparent;
+    }
+    .sidebar-nav a:hover { color:rgba(255,255,255,0.8); background:rgba(0,212,255,0.04); }
+    .sidebar-nav a.active {
+      color:var(--neon); background:rgba(0,212,255,0.07);
+      border-left-color:var(--neon);
+      text-shadow:0 0 8px rgba(0,212,255,0.4);
+    }
+    .sidebar-num {
+      font-family:'Orbitron',sans-serif; font-size:0.6rem; color:inherit; opacity:0.5;
+      min-width:16px;
+    }
+
+    /* ── MAIN CONTENT ── */
+    #content { flex:1; min-width:0; }
+
+    /* ── SECTION ── */
+    .lp-section {
+      padding: 72px 0 0;
+      opacity:0; transform:translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .lp-section.visible { opacity:1; transform:translateY(0); }
+
+    /* Section heading */
+    .section-num {
+      font-family:'Orbitron',sans-serif; font-size:4.5rem; font-weight:900;
+      color:rgba(0,212,255,0.04); letter-spacing:0.05em;
+      line-height:1; margin-bottom:-28px; user-select:none;
+      pointer-events:none;
+    }
+    .section-heading {
+      font-family:'Orbitron',sans-serif; font-size:1.5rem; font-weight:700;
+      letter-spacing:0.08em; color:#fff;
+      margin-bottom:32px;
+      display:flex; align-items:center; gap:14px;
+    }
+    .section-heading::before {
+      content:'';
+      width:4px; height:24px; border-radius:2px;
+      background:linear-gradient(180deg, var(--neon), var(--neon2));
+      box-shadow:0 0 12px rgba(0,212,255,0.5); flex-shrink:0;
+    }
+
+    .lp-body { font-size:0.95rem; line-height:1.8; color:rgba(255,255,255,0.65); }
+    .lp-body p { margin-bottom:16px; }
+
+    /* Pull quote */
+    .pull-quote {
+      margin: 28px 0;
+      padding: 20px 28px;
+      background: rgba(0,212,255,0.06);
+      border-left: 3px solid var(--neon);
+      border-radius: 0 8px 8px 0;
+      font-family:'Orbitron',sans-serif; font-size:0.95rem; font-weight:600;
+      color:var(--neon); letter-spacing:0.04em; line-height:1.5;
+      box-shadow: 0 0 30px rgba(0,212,255,0.06);
+    }
+
+    /* Info box */
+    .info-box {
+      margin:24px 0;
+      padding:18px 22px;
+      background:rgba(0,212,255,0.04);
+      border-left:3px solid var(--neon);
+      border-radius:0 8px 8px 0;
+      font-size:0.88rem; line-height:1.7; color:rgba(255,255,255,0.6);
+    }
+
+    /* ── CITY GRID ── */
+    .city-grid {
+      display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
+      margin:28px 0;
+    }
+    .city-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:10px; padding:14px 16px;
+      transition:all 0.25s;
+    }
+    .city-card:hover { border-color:var(--border2); background:var(--surface2); }
+    .city-dot { width:7px; height:7px; border-radius:50%; background:var(--neon); box-shadow:0 0 8px var(--neon); margin-bottom:10px; animation:pulse-dot 2.5s infinite; }
+    .city-name { font-family:'Orbitron',sans-serif; font-size:0.78rem; font-weight:700; color:#fff; margin-bottom:4px; }
+    .city-coords { font-size:0.65rem; color:var(--muted); letter-spacing:0.04em; }
+
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ── STAT ROW ── */
+    .stat-row { display:flex; gap:16px; margin:28px 0; }
+    .stat-card {
+      flex:1; background:var(--surface); border:1px solid var(--border);
+      border-radius:12px; padding:22px 20px; text-align:center;
+      transition:all 0.25s;
+    }
+    .stat-card:hover { border-color:var(--border2); transform:translateY(-2px); }
+    .stat-big { font-family:'Orbitron',sans-serif; font-size:2.2rem; font-weight:900; color:var(--neon); text-shadow:0 0 20px rgba(0,212,255,0.4); }
+    .stat-lbl { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-top:6px; }
+
+    /* ── FEATURE ROWS ── */
+    .feature-row {
+      display:flex; align-items:flex-start; gap:20px;
+      padding:20px; margin-bottom:14px;
+      background:var(--surface); border:1px solid var(--border); border-radius:10px;
+      transition:all 0.25s;
+    }
+    .feature-row:hover { border-color:var(--border2); }
+    .feature-icon {
+      width:44px; height:44px; border-radius:10px; flex-shrink:0;
+      background:rgba(0,212,255,0.08); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center; font-size:1.2rem;
+    }
+    .feature-title { font-family:'Orbitron',sans-serif; font-size:0.82rem; font-weight:700; color:#fff; margin-bottom:6px; }
+    .feature-desc { font-size:0.85rem; color:var(--muted); line-height:1.6; }
+
+    /* ── TIMELINE STEPS ── */
+    .steps { margin:24px 0; }
+    .step {
+      display:flex; align-items:flex-start; gap:20px;
+      padding:18px 0;
+      border-bottom:1px solid rgba(0,212,255,0.07);
+      position:relative;
+    }
+    .step:last-child { border-bottom:none; }
+    .step-num-wrap {
+      flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:0;
+    }
+    .step-num {
+      width:36px; height:36px; border-radius:50%;
+      background:rgba(0,212,255,0.1); border:2px solid var(--border2);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Orbitron',sans-serif; font-size:0.7rem; font-weight:700;
+      color:var(--neon);
+    }
+    .step-line {
+      width:2px; flex:1; min-height:24px;
+      background:linear-gradient(180deg, var(--neon2), transparent);
+      margin-top:4px; opacity:0.25;
+    }
+    .step-content { padding-top:6px; }
+    .step-title { font-weight:600; color:#fff; margin-bottom:4px; font-size:0.9rem; }
+    .step-desc { font-size:0.84rem; color:var(--muted); line-height:1.6; }
+    .step-closing { font-family:'Orbitron',sans-serif; font-size:0.8rem; color:var(--neon); letter-spacing:0.06em; margin-top:20px; }
+
+
+    .growth-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:24px 0; }
+    .growth-card {
+      background:var(--surface); border:1px solid var(--border); border-radius:12px;
+      padding:24px 22px; transition:all 0.3s; position:relative; overflow:hidden;
+    }
+    .growth-card::before {
+      content:''; position:absolute; top:0; right:0;
+      width:50px; height:50px;
+      background:linear-gradient(225deg,rgba(0,212,255,0.07),transparent);
+      border-radius:0 12px 0 0;
+    }
+    .growth-card:hover { border-color:var(--border2); transform:translateY(-3px); box-shadow:0 8px 30px rgba(0,0,0,0.4); }
+    .growth-icon { font-size:1.6rem; margin-bottom:14px; }
+    .growth-title { font-family:'Orbitron',sans-serif; font-size:0.78rem; font-weight:700; color:#fff; letter-spacing:0.06em; margin-bottom:10px; }
+    .growth-text { font-size:0.84rem; color:var(--muted); line-height:1.65; }
+
+    /* ── ROADMAP ── */
+    .roadmap { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; margin:32px 0; position:relative; }
+    .roadmap::before {
+      content:''; position:absolute; top:22px; left:0; right:0; height:1px;
+      background:linear-gradient(90deg, transparent, var(--neon2), var(--neon), transparent);
+      opacity:0.25;
+    }
+    .phase {
+      background:var(--surface); border:1px solid var(--border);
+      padding:24px 18px; border-radius:12px; position:relative;
+      transition:all 0.25s;
+    }
+    .phase:first-child { border-radius:12px 0 0 12px; }
+    .phase:last-child { border-radius:0 12px 12px 0; }
+    .phase.active { border-color:rgba(0,212,255,0.5); background:rgba(0,212,255,0.05); box-shadow:0 0 24px rgba(0,212,255,0.08); }
+    .phase-dot {
+      width:14px; height:14px; border-radius:50%;
+      border:2px solid rgba(0,212,255,0.3); background:var(--surface);
+      margin-bottom:16px; position:relative; z-index:1;
+    }
+    .phase.active .phase-dot { border-color:var(--neon); background:var(--neon); box-shadow:0 0 12px var(--neon); }
+    .phase-label {
+      font-family:'Orbitron',sans-serif; font-size:0.55rem; font-weight:700;
+      letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-bottom:8px;
+    }
+    .phase.active .phase-label { color:var(--neon); }
+    .phase-title { font-family:'Orbitron',sans-serif; font-size:0.78rem; font-weight:700; color:#fff; margin-bottom:12px; }
+    .phase-items { list-style:none; }
+    .phase-items li {
+      font-size:0.78rem; color:var(--muted); padding:4px 0;
+      border-bottom:1px solid rgba(255,255,255,0.04); line-height:1.4;
+    }
+    .phase-items li:last-child { border-bottom:none; }
+    .phase-items li::before { content:'– '; color:var(--neon); opacity:0.6; }
+    .current-badge {
+      display:inline-block; margin-top:10px;
+      padding:3px 10px; border-radius:20px;
+      background:rgba(0,212,255,0.12); border:1px solid rgba(0,212,255,0.3);
+      font-family:'Orbitron',sans-serif; font-size:0.55rem; font-weight:700;
+      letter-spacing:0.12em; color:var(--neon); text-transform:uppercase;
+    }
+
+    /* ── STATUS BAR ── */
+    #status-bar {
+      position:fixed; bottom:0; left:0; right:0; height:42px;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 32px;
+      background:linear-gradient(0deg,rgba(10,14,26,0.97) 0%,rgba(10,14,26,0) 100%);
+      backdrop-filter:blur(8px); border-top:1px solid var(--border);
+      z-index:100; font-size:0.72rem; letter-spacing:0.06em;
+      text-transform:uppercase; color:rgba(255,255,255,0.45);
+    }
+    .status-item { display:flex; align-items:center; gap:8px; }
+    .status-dot { width:7px; height:7px; border-radius:50%; background:#00FF88; box-shadow:0 0 8px #00FF88; animation:pulse-dot 2s infinite; }
+    .status-val { color:var(--neon); font-weight:600; font-family:'Orbitron',sans-serif; font-size:0.7rem; }
+
+    .disclaimer {
+      text-align:center; font-size:0.7rem; color:rgba(255,255,255,0.2);
+      padding:16px 32px 60px; letter-spacing:0.04em; max-width:700px; margin:0 auto; line-height:1.7;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .city-grid { grid-template-columns:repeat(2,1fr); }
+      .growth-grid { grid-template-columns:1fr; }
+      .roadmap { grid-template-columns:1fr 1fr; gap:8px; }
+      .roadmap::before { display:none; }
+      .phase:first-child, .phase:last-child { border-radius:12px; }
+    }
+    @media (max-width: 768px) {
+      #layout { flex-direction:column; padding:0 20px 80px; gap:0; }
+      #sidebar { width:100%; }
+      #sidebar-inner { position:static; padding:16px 0 0; }
+      .sidebar-nav { display:flex; overflow-x:auto; gap:4px; padding-bottom:12px; }
+      .sidebar-nav li { flex-shrink:0; }
+      .sidebar-nav a { border-left:none; border-bottom:2px solid transparent; border-radius:4px; white-space:nowrap; }
+      .sidebar-nav a.active { border-bottom-color:var(--neon); }
+      #navbar { padding:0 16px; }
+      nav { display:none; flex-direction:column; position:fixed; top:64px; left:0; right:0; background:rgba(10,14,26,0.98); padding:16px; border-bottom:1px solid var(--border); }
+      nav.open { display:flex; }
+      nav a { width:100%; padding:10px 16px; }
+      #hamburger { display:flex; }
+      #hero { padding:100px 20px 48px; }
+      .stat-row { flex-direction:column; }
+      .city-grid { grid-template-columns:repeat(2,1fr); }
+      .roadmap { grid-template-columns:1fr; }
+      .phase { border-radius:12px!important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header id="navbar">
+  <a href="index.html" id="logo">
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 10 L16 4 L24 10 L24 22 L16 28 L8 22 Z" stroke="#00D4FF" stroke-width="1.5" fill="rgba(0,212,255,0.08)"/>
+      <circle cx="16" cy="16" r="3" fill="#00D4FF"/>
+      <path d="M4 16 L12 16 M20 16 L28 16 M16 4 L16 12 M16 20 L16 28" stroke="#00D4FF" stroke-width="1" opacity="0.5"/>
+    </svg>
+    DRONENAV
+  </a>
+  <div id="hamburger" onclick="toggleNav()">
+    <span></span><span></span><span></span>
+  </div>
+  <nav id="nav-links">
+    <a href="index.html">Map</a>
+    <a href="team.html">Team</a>
+    <a href="litepaper.html" class="active">Litepaper</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-top">
+    <div class="hero-left">
+      <div class="hero-eyebrow">◈ DRONENAV PLATFORM</div>
+      <h1>LITEPAPER</h1>
+      <div class="hero-version">v1.0 — Platform Overview &amp; Token Economy</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- MAIN LAYOUT -->
+<div id="layout">
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div id="sidebar-inner">
+      <div class="sidebar-label">Contents</div>
+      <ul class="sidebar-nav">
+        <li><a href="#vision" class="active"><span class="sidebar-num">01</span> Vision</a></li>
+        <li><a href="#platform"><span class="sidebar-num">02</span> Platform</a></li>
+        <li><a href="#infrastructure"><span class="sidebar-num">03</span> Infrastructure</a></li>
+        <li><a href="#gamification"><span class="sidebar-num">04</span> Gamification</a></li>
+        <li><a href="#growth"><span class="sidebar-num">05</span> Growth Strategy</a></li>
+        <li><a href="#roadmap"><span class="sidebar-num">06</span> Roadmap</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- 01 VISION -->
+    <section class="lp-section" id="vision">
+      <div class="section-num">01</div>
+      <h2 class="section-heading">Vision</h2>
+      <div class="lp-body">
+        <p>Design an innovative platform that bridges the physical and digital worlds, allowing users to remotely control real-world drones and explore cities across the globe in real time.</p>
+        <p>The platform lets users connect via the internet to live drone feeds deployed in major cities — not for passive viewing, but for active exploration and real-time interaction. The goal is to bring a new form of presence to the digital experience.</p>
+        <div class="pull-quote">"Not passive viewing — active exploration and interaction."</div>
+      </div>
+    </section>
+
+    <!-- 02 PLATFORM -->
+    <section class="lp-section" id="platform">
+      <div class="section-num">02</div>
+      <h2 class="section-heading">Platform</h2>
+      <div class="lp-body">
+        <p>The platform operates through drones deployed in 8 major cities. Users connect via browser or app, access live video feeds, and navigate locations without being physically present.</p>
+        <div class="city-grid">
+          <div class="city-card"><div class="city-dot"></div><div class="city-name">New York</div><div class="city-coords">40.71°N 74.00°W</div></div>
+          <div class="city-card"><div class="city-dot"></div><div class="city-name">Dubai</div><div class="city-coords">25.20°N 55.27°E</div></div>
+          <div class="city-card"><div class="city-dot"></div><div class="city-name">Istanbul</div><div class="city-coords">41.01°N 28.97°E</div></div>
+          <div class="city-card"><div class="city-dot"></div><div class="city-name">São Paulo</div><div class="city-coords">23.55°S 46.63°W</div></div>
+          <div class="city-card"><div class="city-dot"></div><div class="city-name">London</div><div class="city-coords">51.50°N 0.12°W</div></div>
+          <div class="city-card"><div class="city-dot"></div><div class="city-name">Singapore</div><div class="city-coords">1.35°N 103.82°E</div></div>
+          <div class="city-card"><div class="city-dot"></div><div class="city-name">Sydney</div><div class="city-coords">33.86°S 151.20°E</div></div>
+          <div class="city-card"><div class="city-dot"></div><div class="city-name">Tokyo</div><div class="city-coords">35.68°N 139.69°E</div></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-card"><div class="stat-big">50+</div><div class="stat-lbl">Active Drones</div></div>
+          <div class="stat-card"><div class="stat-big">8</div><div class="stat-lbl">Global Cities</div></div>
+          <div class="stat-card"><div class="stat-big">4</div><div class="stat-lbl">Drone Models</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 INFRASTRUCTURE -->
+    <section class="lp-section" id="infrastructure">
+      <div class="section-num">03</div>
+      <h2 class="section-heading">Infrastructure</h2>
+      <div class="lp-body">
+        <p>The system is supported by 4 different drone models, engineered for real-time control, low latency, and stable connectivity. The infrastructure prioritizes:</p>
+        <div class="feature-row">
+          <div class="feature-icon">⚡</div>
+          <div><div class="feature-title">Real-Time Control</div><div class="feature-desc">Direct user input with sub-200ms latency targets for seamless interactive navigation.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">📡</div>
+          <div><div class="feature-title">Low Latency Streaming</div><div class="feature-desc">Live 4K video feeds optimized for web delivery across all modern devices and connection types.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">🔒</div>
+          <div><div class="feature-title">Stable Connectivity</div><div class="feature-desc">Redundant network layers ensure uninterrupted sessions with automatic failover protocols.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 GAMIFICATION -->
+    <section class="lp-section" id="gamification">
+      <div class="section-num">04</div>
+      <h2 class="section-heading">Gamification</h2>
+      <div class="lp-body">
+        <p>In later stages, the platform will introduce mission-based mechanics and gamification. Users will be able to:</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num-wrap"><div class="step-num">01</div><div class="step-line"></div></div>
+            <div class="step-content"><div class="step-title">Location Challenges</div><div class="step-desc">Complete location-based tasks and navigation challenges across all 8 cities.</div></div>
+          </div>
+          <div class="step">
+            <div class="step-num-wrap"><div class="step-num">02</div><div class="step-line"></div></div>
+            <div class="step-content"><div class="step-title">Earn Rewards</div><div class="step-desc">Earn rewards through interactive exploration experiences and milestone completions.</div></div>
+          </div>
+          <div class="step">
+            <div class="step-num-wrap"><div class="step-num">03</div><div class="step-line"></div></div>
+            <div class="step-content"><div class="step-title">Compete Globally</div><div class="step-desc">Compete in community leaderboards and ranked missions against pilots worldwide.</div></div>
+          </div>
+          <div class="step">
+            <div class="step-num-wrap"><div class="step-num">04</div></div>
+            <div class="step-content"><div class="step-title">Exclusive Access</div><div class="step-desc">Unlock exclusive city access and rare drone models through sustained engagement.</div></div>
+          </div>
+        </div>
+        <div class="step-closing">◈ Engagement is not passive — it is earned.</div>
+      </div>
+    </section>
+
+    <!-- 05 GROWTH STRATEGY -->
+    <section class="lp-section" id="growth">
+      <div class="section-num">05</div>
+      <h2 class="section-heading">Growth Strategy</h2>
+      <div class="growth-grid">
+        <div class="growth-card">
+          <div class="growth-icon">🌱</div>
+          <div class="growth-title">Organic Growth</div>
+          <div class="growth-text">User acquisition driven by genuine utility, not hype. Real experiences create real communities.</div>
+        </div>
+        <div class="growth-card">
+          <div class="growth-icon">⚙️</div>
+          <div class="growth-title">Sustainable Engagement</div>
+          <div class="growth-text">Mission mechanics and token rewards create long-term retention without inflationary pressure.</div>
+        </div>
+        <div class="growth-card">
+          <div class="growth-icon">🤝</div>
+          <div class="growth-title">Community Trust</div>
+          <div class="growth-text">Transparent distribution, fair access, and no price manipulation. Trust is the product.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 ROADMAP -->
+    <section class="lp-section" id="roadmap">
+      <div class="section-num">06</div>
+      <h2 class="section-heading">Roadmap</h2>
+      <div class="roadmap">
+        <div class="phase active">
+          <div class="phase-dot"></div>
+          <div class="phase-label">Phase 1</div>
+          <div class="phase-title">Foundation</div>
+          <ul class="phase-items">
+            <li>Platform infrastructure deployment</li>
+            <li>8 city drone network live</li>
+            <li>Initial buy phase open</li>
+          </ul>
+          <div class="current-badge">● Current</div>
+        </div>
+        <div class="phase">
+          <div class="phase-dot"></div>
+          <div class="phase-label">Phase 2</div>
+          <div class="phase-title">Beta Launch</div>
+          <ul class="phase-items">
+            <li>Live video feed access for users</li>
+            <li>Basic navigation controls</li>
+            <li>Community building begins</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-dot"></div>
+          <div class="phase-label">Phase 3</div>
+          <div class="phase-title">Gamification</div>
+          <ul class="phase-items">
+            <li>Mission system launch</li>
+            <li>Leaderboards and rewards</li>
+            <li>Token utility activation</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-dot"></div>
+          <div class="phase-label">Phase 4</div>
+          <div class="phase-title">Scale</div>
+          <ul class="phase-items">
+            <li>Additional cities onboarded</li>
+            <li>Advanced drone models</li>
+            <li>5M FDV milestone target</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+</div><!-- /layout -->
+
+<p class="disclaimer">This document is a litepaper and does not constitute financial advice. All projections are estimates subject to change. Always conduct your own research before making any investment decisions.</p>
+
+<!-- STATUS BAR -->
+<footer id="status-bar">
+  <div class="status-item"><div class="status-dot"></div><span>System Online</span></div>
+  <div class="status-item"><span>Document:</span><span class="status-val">LITEPAPER v1.0</span></div>
+  <div class="status-item"><span>Last Updated:</span><span class="status-val" id="timestamp">—</span></div>
+</footer>
+
+<script>
+  // Timestamp
+  function updateTime(){ document.getElementById('timestamp').textContent = new Date().toLocaleTimeString('en-US',{hour12:false}); }
+  updateTime(); setInterval(updateTime, 60000);
+
+  // Nav toggle
+  function toggleNav(){ document.getElementById('nav-links').classList.toggle('open'); }
+
+  // IntersectionObserver — fade in sections
+  const sections = document.querySelectorAll('.lp-section');
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); } });
+  }, { threshold:0.08 });
+  sections.forEach(s => sectionObserver.observe(s));
+
+  // Scrollspy — sidebar active link
+  const sideLinks = document.querySelectorAll('.sidebar-nav a');
+  const sectionIds = ['vision','platform','infrastructure','gamification','growth','roadmap'];
+
+  function onScroll() {
+    let current = 'vision';
+    sectionIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && window.scrollY >= el.offsetTop - 140) current = id;
+    });
+    sideLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive:true });
+  onScroll();
+</script>
+</body>
+</html>

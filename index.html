@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DRONENAV — Global Fleet Monitor</title>
+  <meta name="description"
+    content="Real-time 3D drone fleet monitoring platform with global coverage and live telemetry." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --neon: #00D4FF;
+      --neon2: #0066FF;
+      --red: #FF3A3A;
+      --green: #00FF88;
+      --yellow: #FFD700;
+      --bg: #020812;
+      --card-bg: rgba(4, 18, 40, 0.95);
+      --border: rgba(0, 212, 255, 0.25);
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Mobilde scroll aktif — küre 100vh, alt bölüm scroll ile geliyor */
+    @media (max-width: 640px) {
+
+      html,
+      body {
+        height: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+
+      #globe-canvas {
+        position: relative !important;
+        height: 100svh !important;
+        /* safe viewport height */
+      }
+    }
+
+    /* ── CANVAS ── */
+    #globe-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+
+    #globe-canvas:active {
+      cursor: grabbing;
+    }
+
+    /* ── SCANLINE OVERLAY ── */
+    #scanlines {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 212, 255, 0.015) 2px,
+          rgba(0, 212, 255, 0.015) 4px);
+      z-index: 5;
+    }
+
+    /* ── NAVBAR ── */
+    #navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      background: linear-gradient(180deg, rgba(2, 8, 18, 0.95) 0%, rgba(2, 8, 18, 0.0) 100%);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    #logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      color: var(--neon);
+      text-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+      text-decoration: none;
+    }
+
+    #logo svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    nav a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      transition: all 0.25s;
+    }
+
+    nav a:hover {
+      color: var(--neon);
+      border-color: var(--border);
+      background: rgba(0, 212, 255, 0.05);
+      text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    }
+
+    #hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    #hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--neon);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    /* ── STATUS BAR ── */
+    #status-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      background: linear-gradient(0deg, rgba(2, 8, 18, 0.95) 0%, rgba(2, 8, 18, 0) 100%);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--border);
+      z-index: 100;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    .status-val {
+      color: var(--neon);
+      font-weight: 600;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.7rem;
+    }
+
+    /* ── DRONE MARKERS (HTML overlays) ── */
+    .drone-marker {
+      position: fixed;
+      transform: translate(-50%, -50%);
+      width: 48px;
+      height: 48px;
+      cursor: pointer;
+      z-index: 50;
+      pointer-events: auto;
+    }
+
+    .marker-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pulse-ring {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid var(--neon);
+      animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+      opacity: 0;
+    }
+
+    .pulse-ring:nth-child(2) {
+      animation-delay: 0.6s;
+    }
+
+    .pulse-ring:nth-child(3) {
+      animation-delay: 1.2s;
+    }
+
+    @keyframes ping {
+      0% {
+        transform: scale(0.5);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: scale(2.8);
+        opacity: 0;
+      }
+    }
+
+    .marker-dot {
+      width: 16px;
+      height: 16px;
+      background: var(--neon);
+      border-radius: 50%;
+      box-shadow: 0 0 12px var(--neon), 0 0 24px rgba(0, 212, 255, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(255, 255, 255, 0.9);
+      z-index: 2;
+    }
+
+    .marker-label {
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.52rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--neon);
+      white-space: nowrap;
+      text-shadow: 0 0 8px rgba(0, 212, 255, 0.8), 0 1px 3px #000;
+      pointer-events: none;
+    }
+
+    /* Status color overrides */
+    .status-STANDBY .pulse-ring {
+      border-color: var(--yellow);
+    }
+
+    .status-STANDBY .marker-dot {
+      background: var(--yellow);
+      box-shadow: 0 0 12px var(--yellow);
+    }
+
+    .status-STANDBY .marker-label {
+      color: var(--yellow);
+    }
+
+    .status-MAINTENANCE .pulse-ring {
+      border-color: var(--red);
+    }
+
+    .status-MAINTENANCE .marker-dot {
+      background: var(--red);
+      box-shadow: 0 0 12px var(--red);
+    }
+
+    .status-MAINTENANCE .marker-label {
+      color: var(--red);
+    }
+
+    /* ── POPUP CARD ── */
+    #popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      backdrop-filter: blur(4px);
+    }
+
+    #popup-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #popup-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 360px;
+      max-width: calc(100vw - 32px);
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+      box-shadow: 0 0 60px rgba(0, 212, 255, 0.15), 0 24px 80px rgba(0, 0, 0, 0.6);
+      transform: scale(0.88) translateY(20px);
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    #popup-overlay.active #popup-card {
+      transform: scale(1) translateY(0);
+    }
+
+    #popup-hero {
+      width: 100%;
+      height: 190px;
+      object-fit: contain;
+      object-position: center;
+      border-radius: 14px 14px 0 0;
+      display: block;
+      background: linear-gradient(135deg, #060e1f 0%, #0a1a30 50%, #060e1f 100%);
+      padding: 12px;
+    }
+
+    #popup-body {
+      padding: 20px;
+    }
+
+    #popup-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    #popup-brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      object-fit: contain;
+      background: rgba(0, 212, 255, 0.06);
+      padding: 4px;
+    }
+
+    #popup-model {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+      margin-bottom: 3px;
+    }
+
+    #popup-brand-name {
+      font-size: 0.72rem;
+      color: var(--neon);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    #popup-close {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+
+    #popup-close:hover {
+      background: rgba(255, 60, 60, 0.15);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    #popup-location {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #popup-location span {
+      color: var(--neon);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.65rem;
+    }
+
+    #popup-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+
+    #popup-status-badge.ACTIVE {
+      background: rgba(0, 255, 136, 0.12);
+      border: 1px solid rgba(0, 255, 136, 0.4);
+      color: var(--green);
+    }
+
+    #popup-status-badge.STANDBY {
+      background: rgba(255, 215, 0, 0.12);
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      color: var(--yellow);
+    }
+
+    #popup-status-badge.MAINTENANCE {
+      background: rgba(255, 58, 58, 0.12);
+      border: 1px solid rgba(255, 58, 58, 0.4);
+      color: var(--red);
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse-dot 1.5s infinite;
+    }
+
+    #popup-specs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .spec-item {
+      background: rgba(0, 212, 255, 0.04);
+      border: 1px solid rgba(0, 212, 255, 0.1);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .spec-label {
+      font-size: 0.62rem;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 5px;
+    }
+
+    .spec-val {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    #popup-cta {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--neon2), var(--neon));
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+    }
+
+    #popup-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 212, 255, 0.5);
+    }
+
+    /* ── LOADING SCREEN ── */
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      z-index: 999;
+      transition: opacity 0.8s ease;
+    }
+
+    #loading h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--neon);
+      letter-spacing: 0.2em;
+      text-shadow: 0 0 30px rgba(0, 212, 255, 0.6);
+    }
+
+    .loading-bar-wrap {
+      width: 240px;
+      height: 3px;
+      background: rgba(0, 212, 255, 0.15);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .loading-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--neon2), var(--neon));
+      transition: width 0.4s ease;
+      box-shadow: 0 0 12px var(--neon);
+    }
+
+    .loading-status {
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+    }
+
+    /* ── INFO PANEL (corner) ── */
+    #info-panel {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.35);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      z-index: 60;
+      line-height: 1.9;
+      pointer-events: none;
+    }
+
+    #info-panel span {
+      color: var(--neon);
+      font-weight: 600;
+    }
+
+    /* ── RESPONSIVE ── */
+
+    /* Tablet — 1100px */
+    @media (max-width: 1100px) {
+      #left-panel {
+        width: 230px;
+        left: 12px;
+      }
+
+      #right-panel {
+        width: 170px;
+        right: 12px;
+        gap: 8px;
+      }
+
+      .card-img-wrap {
+        height: 80px;
+      }
+
+      .drone-card img {
+        height: 70px;
+      }
+    }
+
+    /* Tablet küçük / günde — 900px */
+    @media (max-width: 900px) {
+      #left-panel {
+        width: 190px;
+        left: 10px;
+      }
+
+      .panel-coords {
+        display: none;
+      }
+
+      #right-panel {
+        width: 150px;
+        right: 10px;
+        gap: 7px;
+      }
+
+      .drone-card-sub {
+        display: none;
+      }
+
+      .card-img-wrap {
+        height: 68px;
+      }
+
+      .drone-card img {
+        height: 60px;
+      }
+
+      .drone-card-footer {
+        padding: 6px 10px 7px;
+      }
+
+      .drone-card-name {
+        font-size: 0.58rem;
+      }
+    }
+
+    /* Mobil — 640px */
+    @media (max-width: 640px) {
+      #navbar {
+        padding: 0 16px;
+      }
+
+      nav {
+        display: none;
+        flex-direction: column;
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: rgba(2, 8, 18, 0.97);
+        padding: 16px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      nav.open {
+        display: flex;
+      }
+
+      nav a {
+        width: 100%;
+        padding: 10px 16px;
+      }
+
+      #hamburger {
+        display: flex;
+      }
+
+      #info-panel {
+        display: none;
+      }
+
+      #status-bar {
+        padding: 0 12px;
+        font-size: 0.6rem;
+        gap: 8px;
+      }
+
+      #status-bar .status-item:nth-child(2) {
+        display: none;
+      }
+
+      #popup-card {
+        width: calc(100vw - 20px);
+      }
+
+      /* Sabit yan paneller mobilde kapat */
+      #left-panel,
+      #right-panel {
+        display: none !important;
+      }
+
+      /* Mobil alt bölüm görünür */
+      #mobile-section {
+        display: block;
+      }
+    }
+
+    /* ── MOBİL ALT BÖLÜM ── */
+    #mobile-section {
+      display: none;
+      /* masavistü/tablet gizli */
+      width: 100%;
+      background: var(--bg);
+      padding: 24px 16px 80px;
+      /* status bar için alt boşluk */
+      z-index: 1;
+      position: relative;
+    }
+
+    .mobile-section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--neon);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0.8;
+    }
+
+    .mobile-section-title::before {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.3));
+    }
+
+    /* Video — mobil */
+    #mobile-video-wrap {
+      width: 100%;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(0, 212, 255, 0.25);
+      margin-bottom: 24px;
+      background: #000;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    #mobile-video-wrap video {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+      max-height: 240px;
+    }
+
+    .mob-vid-label {
+      padding: 8px 14px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.55rem;
+      color: rgba(0, 212, 255, 0.6);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-top: 1px solid rgba(0, 212, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 212, 255, 0.03);
+    }
+
+    /* Kartlar — mobil, 2 sütun */
+    #mobile-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .mob-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+
+    .mob-card-img {
+      width: 100%;
+      height: 80px;
+      background: linear-gradient(135deg, #e8f4ff, #c8e8ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mob-card-img img {
+      width: 90%;
+      height: 70px;
+      object-fit: contain;
+      filter: drop-shadow(0 3px 8px rgba(0, 100, 200, 0.2));
+    }
+
+    .mob-card-name {
+      padding: 8px 10px 9px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.58rem;
+      font-weight: 700;
+      color: #00a8e8;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-top: 1px solid rgba(0, 180, 255, 0.12);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      background: #fff;
+    }
+
+    /* Düz animasyon tercihi — erişilebilirlik */
+    @media (prefers-reduced-motion: reduce) {
+      #left-panel {
+        animation: none;
+      }
+
+      .drone-card {
+        animation: none;
+        opacity: 1;
+      }
+
+      .video-wrapper::before {
+        animation: none;
+      }
+    }
+
+    /* ────────────────────────────────
+       LEFT VIDEO PANEL
+    ──────────────────────────────── */
+    #left-panel {
+      position: fixed;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 300px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(0, 212, 255, 0.28);
+      border-radius: 18px;
+      overflow: hidden;
+      z-index: 60;
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      box-shadow: 0 0 40px rgba(0, 212, 255, 0.1), 0 20px 60px rgba(0, 0, 0, 0.55);
+      animation: panelFloat 6s ease-in-out infinite;
+      will-change: transform;
+    }
+
+    @keyframes panelFloat {
+
+      0%,
+      100% {
+        transform: translateY(-50%) translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-50%) translateY(-7px);
+      }
+    }
+
+    .panel-header {
+      padding: 11px 16px 10px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--neon);
+      border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0, 212, 255, 0.04);
+    }
+
+    .panel-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #00FF88;
+      box-shadow: 0 0 8px #00FF88, 0 0 16px rgba(0, 255, 136, 0.4);
+      animation: pulse-dot 1.2s ease-in-out infinite;
+    }
+
+    .panel-rec-tag {
+      font-size: 0.5rem;
+      letter-spacing: 0.15em;
+      color: rgba(0, 255, 136, 0.7);
+      background: rgba(0, 255, 136, 0.08);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 4px;
+      padding: 2px 7px;
+    }
+
+    /* Video wrapper — prevent layout reflow */
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #left-panel video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      will-change: transform;
+      /* GPU hızlandırma */
+      transform: translateZ(0);
+      /* GPU katmanı zorla */
+    }
+
+    /* Neon scanline over video */
+    .video-wrapper::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg,
+          transparent,
+          transparent 3px,
+          rgba(0, 212, 255, 0.025) 3px,
+          rgba(0, 212, 255, 0.025) 4px);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Sweep shimmer over video */
+    .video-wrapper::before {
+      content: '';
+      position: absolute;
+      top: -100%;
+      left: -60%;
+      width: 40%;
+      height: 300%;
+      background: linear-gradient(105deg, transparent 40%, rgba(0, 212, 255, 0.06) 50%, transparent 60%);
+      animation: videoSweep 4s linear infinite;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    @keyframes videoSweep {
+      0% {
+        left: -60%;
+      }
+
+      100% {
+        left: 120%;
+      }
+    }
+
+    .panel-footer {
+      padding: 9px 16px;
+      font-size: 0.58rem;
+      color: rgba(0, 212, 255, 0.6);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-family: 'Orbitron', sans-serif;
+      border-top: 1px solid rgba(0, 212, 255, 0.1);
+      background: rgba(0, 212, 255, 0.03);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-coords {
+      font-size: 0.5rem;
+      color: rgba(0, 212, 255, 0.4);
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    /* ────────────────────────────────
+       RIGHT DRONE CARDS
+    ──────────────────────────────── */
+    #right-panel {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 210px;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .drone-card {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(0, 212, 255, 0.25);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35), 0 0 0 0 rgba(0, 212, 255, 0);
+      transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.32s ease,
+        border-color 0.25s;
+      cursor: pointer;
+      position: relative;
+      /* staggered entry */
+      opacity: 0;
+      animation: cardEntry 0.6s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+    }
+
+    .drone-card:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .drone-card:nth-child(2) {
+      animation-delay: 0.22s;
+    }
+
+    .drone-card:nth-child(3) {
+      animation-delay: 0.34s;
+    }
+
+    .drone-card:nth-child(4) {
+      animation-delay: 0.46s;
+    }
+
+    @keyframes cardEntry {
+      from {
+        opacity: 0;
+        transform: translateX(40px) scale(0.92);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+
+    /* Shimmer sweep on card surface */
+    .drone-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -80%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.6) 50%, transparent 70%);
+      transition: left 0.6s ease;
+      z-index: 3;
+      pointer-events: none;
+      border-radius: 16px;
+    }
+
+    .drone-card:hover::before {
+      left: 140%;
+    }
+
+    /* Neon border pulse on hover */
+    .drone-card:hover {
+      transform: translateX(-6px) scale(1.03);
+      border-color: rgba(0, 212, 255, 0.8);
+      box-shadow:
+        0 0 0 2px rgba(0, 212, 255, 0.15),
+        0 0 24px rgba(0, 212, 255, 0.25),
+        0 12px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-img-wrap {
+      position: relative;
+      width: 100%;
+      height: 100px;
+      background: linear-gradient(135deg, #e8f4ff 0%, #c8e8ff 50%, #ddf2ff 100%);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Light shimmer bg on image area */
+    .card-img-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 30%, rgba(0, 180, 255, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .drone-card img {
+      width: 90%;
+      height: 88px;
+      object-fit: contain;
+      display: block;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 4px 12px rgba(0, 100, 200, 0.2));
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s;
+    }
+
+    .drone-card:hover img {
+      transform: scale(1.1) translateY(-4px);
+      filter: drop-shadow(0 8px 20px rgba(0, 150, 255, 0.35));
+    }
+
+    .drone-card-footer {
+      padding: 9px 13px 10px;
+      background: #fff;
+      border-top: 1px solid rgba(0, 180, 255, 0.12);
+      position: relative;
+    }
+
+    .drone-card-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #00a8e8;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 3px;
+      contain: layout style;
+      /* paint isolation */
+    }
+
+    .drone-card-sub {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.58rem;
+      color: #7fb8d4;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* ── PERF: contain ── */
+    #left-panel {
+      contain: layout;
+    }
+
+    #right-panel {
+      contain: layout;
+    }
+
+    .drone-card {
+      contain: layout paint;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Loading Screen -->
+  <div id="loading">
+    <h1>DRONENAV</h1>
+    <div class="loading-bar-wrap">
+      <div class="loading-bar" id="load-bar"></div>
+    </div>
+    <div class="loading-status" id="load-status">Initializing systems...</div>
+  </div>
+
+  <!-- Scanlines -->
+  <div id="scanlines"></div>
+
+  <!-- Canvas -->
+  <canvas id="globe-canvas"></canvas>
+
+  <!-- LEFT VIDEO PANEL -->
+  <div id="left-panel">
+    <div class="panel-header">
+      <div class="panel-header-left">
+        <div class="panel-live-dot"></div>
+
+      </div>
+      <span class="panel-rec-tag"></span>
+    </div>
+    <div class="video-wrapper">
+      <video autoplay muted loop playsinline preload="auto" decoding="async"
+        style="will-change:transform;transform:translateZ(0)">
+        <source src="IMG/Whatsapp Video 2026-04-08 at 23.54.44.mp4" type="video/mp4">
+      </video>
+    </div>
+
+  </div>
+
+  <!-- Navbar -->
+  <header id="navbar">
+    <a href="#" id="logo">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 10 L16 4 L24 10 L24 22 L16 28 L8 22 Z" stroke="#00D4FF" stroke-width="1.5"
+          fill="rgba(0,212,255,0.08)" />
+        <circle cx="16" cy="16" r="3" fill="#00D4FF" />
+        <path d="M4 16 L12 16 M20 16 L28 16 M16 4 L16 12 M16 20 L16 28" stroke="#00D4FF" stroke-width="1"
+          opacity="0.5" />
+      </svg>
+      DRONENAV
+    </a>
+    <div id="hamburger" onclick="toggleNav()">
+      <span></span><span></span><span></span>
+    </div>
+    <nav id="nav-links">
+      <a href="#">Map</a>
+      <a href="team.html">Team</a>
+      <a href="litepaper.html">Litepaper</a>
+    </nav>
+  </header>
+
+  <!-- Info panel -->
+  <div id="info-panel">
+    <div>Drag to rotate</div>
+    <div>Scroll to zoom</div>
+    <div>Click marker → <span>view details</span></div>
+  </div>
+
+  <!-- RIGHT DRONE CARDS -->
+  <div id="right-panel">
+    <div class="drone-card">
+      <div class="card-img-wrap">
+        <img src="IMG/Inspire.png" alt="DJI Inspire 3" decoding="async" />
+      </div>
+      <div class="drone-card-footer">
+        <div class="drone-card-name">DJI Inspire 3</div>
+        <div class="drone-card-sub">Cinema · 8K RAW</div>
+      </div>
+    </div>
+    <div class="drone-card">
+      <div class="card-img-wrap">
+        <img src="IMG/Nano.jpg" alt="Autel Evo Nano" decoding="async" />
+      </div>
+      <div class="drone-card-footer">
+        <div class="drone-card-name">Autel Evo Nano</div>
+        <div class="drone-card-sub">Compact · 48MP</div>
+      </div>
+    </div>
+    <div class="drone-card">
+      <div class="card-img-wrap">
+        <img src="IMG/Phantom 4 pro.jpg" alt="DJI Phantom 4 Pro" decoding="async" />
+      </div>
+      <div class="drone-card-footer">
+        <div class="drone-card-name">DJI Phantom 4 Pro</div>
+        <div class="drone-card-sub">Pro · 4K/60fps</div>
+      </div>
+    </div>
+    <div class="drone-card">
+      <div class="card-img-wrap">
+        <img src="IMG/SONYDRONE.jpg" alt="Sony Airpeak S1" decoding="async" />
+      </div>
+      <div class="drone-card-footer">
+        <div class="drone-card-name">Sony Airpeak S1</div>
+        <div class="drone-card-sub">Alpha · Mirrorless</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBİL ALT BÖLÜM: kürenin altında scroll ile gelir -->
+  <section id="mobile-section">
+    <div class="mobile-section-title"></div>
+
+    <!-- Video -->
+    <div id="mobile-video-wrap">
+      <video autoplay muted loop playsinline preload="auto" style="will-change:transform;transform:translateZ(0)">
+        <source src="IMG/Whatsapp Video 2026-04-08 at 23.54.44.mp4" type="video/mp4">
+      </video>
+      <div class="mob-vid-label">
+        <div class="panel-live-dot"></div>
+        DJI Inspire 3 — Istanbul · 41.01°N 28.97°E
+      </div>
+    </div>
+
+    <!-- Drone Kartlar -->
+    <div class="mobile-section-title" style="margin-top:8px">Fleet Models</div>
+    <div id="mobile-cards">
+      <div class="mob-card">
+        <div class="mob-card-img"><img src="IMG/Inspire.png" alt="DJI Inspire 3" loading="lazy" /></div>
+        <div class="mob-card-name">DJI Inspire 3</div>
+      </div>
+      <div class="mob-card">
+        <div class="mob-card-img"><img src="IMG/Nano.jpg" alt="Autel Evo Nano" loading="lazy" /></div>
+        <div class="mob-card-name">Autel Evo Nano</div>
+      </div>
+      <div class="mob-card">
+        <div class="mob-card-img"><img src="IMG/Phantom 4 pro.jpg" alt="DJI Phantom 4 Pro" loading="lazy" /></div>
+        <div class="mob-card-name">Phantom 4 Pro</div>
+      </div>
+      <div class="mob-card">
+        <div class="mob-card-img"><img src="IMG/SONYDRONE.jpg" alt="Sony Airpeak S1" loading="lazy" /></div>
+        <div class="mob-card-name">Sony Airpeak</div>
+      </div>
+    </div>
+  </section>
+  <footer id="status-bar">
+    <div class="status-item">
+      <div class="status-dot"></div>
+      <span>System Online</span>
+    </div>
+    <div class="status-item">
+      <span>Active Drones:</span>
+      <span class="status-val" id="active-count">—</span>
+    </div>
+    <div class="status-item">
+      <span>Last Updated:</span>
+      <span class="status-val" id="timestamp">—</span>
+    </div>
+  </footer>
+
+  <!-- Popup Overlay -->
+  <div id="popup-overlay" onclick="closePopup(event)">
+    <div id="popup-card">
+      <img id="popup-hero" src="" alt="Drone photo" />
+      <div id="popup-body">
+        <div id="popup-header">
+          <div>
+            <div id="popup-model">Model Name</div>
+            <div id="popup-brand-name">Brand</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <img id="popup-brand-logo" src="" alt="Brand logo" />
+            <button id="popup-close" onclick="closePopupBtn()">✕</button>
+          </div>
+        </div>
+        <div id="popup-location">
+          📍 <strong id="popup-city">City</strong>
+          &nbsp;|&nbsp;
+          <span id="popup-coords">0.00°, 0.00°</span>
+        </div>
+        <div id="popup-status-badge" class="ACTIVE">
+          <div class="badge-dot"></div>
+          <span id="popup-status-text">ACTIVE</span>
+        </div>
+        <div id="popup-specs">
+          <div class="spec-item">
+            <div class="spec-label">Max Speed</div>
+            <div class="spec-val" id="s-speed">—</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Flight Time</div>
+            <div class="spec-val" id="s-time">—</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Range</div>
+            <div class="spec-val" id="s-range">—</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Camera</div>
+            <div class="spec-val" id="s-cam">—</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Fleet Size</div>
+            <div class="spec-val" id="s-count">—</div>
+          </div>
+        </div>
+      </div>
+      <!-- View Details kaldırıldı -->
+    </div>
+  </div>
+  </div>
+
+  <!-- THREE.JS CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+    // ═══════════════════════════════════════════════════════
+    // DRONE DATA — Model, şehir büyüklüğüne göre count (3-12)
+    // Modeller: DJI Inspire 3, Autel Evo Nano, DJI Phantom 4 Pro, Sony Airpeak
+    // ═══════════════════════════════════════════════════════
+    const drones = [
+      // İstanbul — büyük şehir (12 drone)
+      { city: "Istanbul", lat: 41.01, lng: 28.97, model: "DJI Inspire 3", brand: "Inspire", count: 12, speed: "94 km/h", flightTime: "28 min", range: "15 km", camera: "8K/75fps ProRes RAW", status: "ACTIVE" },
+      // New York — büyük şehir (12 drone)
+      { city: "New York", lat: 40.71, lng: -74.00, model: "DJI Phantom 4 Pro", brand: "Phantom", count: 12, speed: "72 km/h", flightTime: "30 min", range: "7 km", camera: "4K/60fps 20MP", status: "ACTIVE" },
+      // Tokyo — büyük şehir (11 drone)
+      { city: "Tokyo", lat: 35.68, lng: 139.69, model: "Sony Airpeak S1", brand: "SONY", count: 11, speed: "90 km/h", flightTime: "22 min", range: "5 km", camera: "Alpha Mirrorless", status: "ACTIVE" },
+      // Dubai — orta-büyük (9 drone)
+      { city: "Dubai", lat: 25.20, lng: 55.27, model: "DJI Inspire 3", brand: "Inspire", count: 9, speed: "94 km/h", flightTime: "28 min", range: "15 km", camera: "8K/75fps ProRes RAW", status: "ACTIVE" },
+      // São Paulo — orta-büyük (9 drone)
+      { city: "São Paulo", lat: -23.55, lng: -46.63, model: "DJI Phantom 4 Pro", brand: "Phantom", count: 9, speed: "72 km/h", flightTime: "30 min", range: "7 km", camera: "4K/60fps 20MP", status: "STANDBY" },
+      // London — orta (7 drone)
+      { city: "London", lat: 51.50, lng: -0.12, model: "Autel Evo Nano", brand: "Nano", count: 7, speed: "53 km/h", flightTime: "28 min", range: "10 km", camera: "48MP / 4K/30fps", status: "STANDBY" },
+      // Singapore — orta (6 drone)
+      { city: "Singapore", lat: 1.35, lng: 103.82, model: "Sony Airpeak S1", brand: "SONY", count: 6, speed: "90 km/h", flightTime: "22 min", range: "5 km", camera: "Alpha Mirrorless", status: "ACTIVE" },
+      // Sydney — küçük-orta (3 drone)
+      { city: "Sydney", lat: -33.86, lng: 151.20, model: "Autel Evo Nano", brand: "Nano", count: 3, speed: "53 km/h", flightTime: "28 min", range: "10 km", camera: "48MP / 4K/30fps", status: "MAINTENANCE" }
+    ];
+
+    // Drone hero images — local fotoğraflar (IMG/ klasörü, göreli yol)
+    const droneImages = {
+      "Inspire": "IMG/Inspire.png",
+      "Phantom": "IMG/Phantom 4 pro.jpg",
+      "SONY": "IMG/SONYDRONE.jpg",
+      "Nano": "IMG/Nano.jpg"
+    };
+
+    // ═══════════════════════════════════════════════════════
+    // LOADING PROGRESS
+    // ═══════════════════════════════════════════════════════
+    const loadBar = document.getElementById('load-bar');
+    const loadStatus = document.getElementById('load-status');
+    function setLoad(pct, msg) {
+      loadBar.style.width = pct + '%';
+      loadStatus.textContent = msg;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // THREE.JS GLOBE
+    // ═══════════════════════════════════════════════════════
+    const canvas = document.getElementById('globe-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 2.8;
+
+    // ── Stars ──────────────────────────────────────────────
+    (function createStars() {
+      const geo = new THREE.BufferGeometry();
+      const count = 3000;
+      const positions = new Float32Array(count * 3);
+      for (let i = 0; i < count * 3; i++) {
+        positions[i] = (Math.random() - 0.5) * 200;
+      }
+      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.12, transparent: true, opacity: 0.7 });
+      scene.add(new THREE.Points(geo, mat));
+    })();
+
+    // ── Texture loader ────────────────────────────────────
+    const loader = new THREE.TextureLoader();
+    setLoad(10, 'Loading Earth textures...');
+
+    // ── Globe ─────────────────────────────────────────────
+    const globeGeo = new THREE.SphereGeometry(1, 64, 64);
+
+    let dayTex, nightTex, globeMesh;
+    let texturesLoaded = 0;
+
+    function onTextureLoad() {
+      texturesLoaded++;
+      if (texturesLoaded === 2) initGlobe();
+    }
+
+    // Day texture
+    dayTex = loader.load(
+      'https://unpkg.com/three-globe@2.24.4/example/img/earth-day.jpg',
+      onTextureLoad,
+      undefined,
+      () => { dayTex = loader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg', onTextureLoad); }
+    );
+
+    // Night texture
+    nightTex = loader.load(
+      'https://unpkg.com/three-globe@2.24.4/example/img/earth-night.jpg',
+      onTextureLoad,
+      undefined,
+      () => { nightTex = { image: null }; onTextureLoad(); }
+    );
+
+    function initGlobe() {
+      setLoad(55, 'Assembling globe...');
+
+      const mat = new THREE.MeshPhongMaterial({
+        map: dayTex,
+        emissiveMap: nightTex,
+        emissive: new THREE.Color(0xffa020),
+        emissiveIntensity: 0.6,
+        specular: new THREE.Color(0x4488aa),
+        shininess: 25,
+      });
+
+      globeMesh = new THREE.Mesh(globeGeo, mat);
+      scene.add(globeMesh);
+
+      // ── Grid overlay (latitude/longitude lines) ──────────
+      const gridMat = new THREE.MeshBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.06, wireframe: true });
+      const gridMesh = new THREE.Mesh(new THREE.SphereGeometry(1.001, 36, 18), gridMat);
+      scene.add(gridMesh);
+
+      // ── Atmosphere glow ──────────────────────────────────
+      const atmMat = new THREE.MeshPhongMaterial({
+        color: 0x0088ff,
+        transparent: true,
+        opacity: 0.12,
+        side: THREE.FrontSide,
+      });
+      const atmMesh = new THREE.Mesh(new THREE.SphereGeometry(1.08, 64, 64), atmMat);
+      scene.add(atmMesh);
+
+      // outer glow ring
+      const outerAtm = new THREE.Mesh(
+        new THREE.SphereGeometry(1.14, 64, 64),
+        new THREE.MeshPhongMaterial({ color: 0x004488, transparent: true, opacity: 0.04, side: THREE.FrontSide })
+      );
+      scene.add(outerAtm);
+
+      setLoad(80, 'Placing drone markers...');
+      setTimeout(() => {
+        initMarkers();
+        setLoad(100, 'Ready');
+        setTimeout(hideLoader, 500);
+      }, 300);
+    }
+
+    // ── Lighting ──────────────────────────────────────────
+    const sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    sunLight.position.set(5, 3, 5);
+    scene.add(sunLight);
+    scene.add(new THREE.AmbientLight(0x111133, 1.2));
+
+    // ══════════════════════════════════════════════════════
+    // LAT/LNG → 3D POSITION
+    // ══════════════════════════════════════════════════════
+    function latLngToVector3(lat, lng, r = 1) {
+      const phi = (90 - lat) * (Math.PI / 180);
+      const theta = (lng + 180) * (Math.PI / 180);
+      return new THREE.Vector3(
+        -r * Math.sin(phi) * Math.cos(theta),
+        r * Math.cos(phi),
+        r * Math.sin(phi) * Math.sin(theta)
+      );
+    }
+
+    // ══════════════════════════════════════════════════════
+    // HTML MARKERS
+    // ══════════════════════════════════════════════════════
+    const markerEls = [];
+
+    function initMarkers() {
+      drones.forEach((d, i) => {
+        const div = document.createElement('div');
+        div.className = `drone-marker status-${d.status}`;
+        div.id = `marker-${i}`;
+        div.innerHTML = `
+      <div class="marker-inner">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <div class="marker-dot">
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="white">
+            <path d="M12 2L8 6H2v4l4 2v4l-4 2v4h6l4 4 4-4h6v-4l-4-2v-4l4-2V6h-6L12 2z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="marker-label">${d.city.toUpperCase()}</div>
+    `;
+        div.addEventListener('click', () => openPopup(i));
+        document.body.appendChild(div);
+
+        const pos = latLngToVector3(d.lat, d.lng, 1.0);
+        markerEls.push({ el: div, globePos: pos, droneIndex: i });
+      });
+
+      updateStatusBar();
+    }
+
+    // ══════════════════════════════════════════════════════
+    // MARKER POSITION UPDATE (project 3D → screen)
+    // ══════════════════════════════════════════════════════
+    function updateMarkers() {
+      if (!globeMesh) return;
+      const tempV = new THREE.Vector3();
+      markerEls.forEach(({ el, globePos }) => {
+        // Rotate globe position by current globe rotation
+        tempV.copy(globePos).applyEuler(globeMesh.rotation);
+        const projected = tempV.clone().project(camera);
+
+        // Check if behind globe
+        const dot = tempV.dot(camera.position.clone().normalize());
+        const isBehind = dot < 0;
+
+        if (isBehind) {
+          el.style.display = 'none';
+          return;
+        }
+        el.style.display = 'block';
+
+        const x = (projected.x * 0.5 + 0.5) * window.innerWidth;
+        const y = (-projected.y * 0.5 + 0.5) * window.innerHeight;
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+
+        // Scale by distance
+        const dist = camera.position.length();
+        const scale = Math.max(0.6, Math.min(1.2, 2.8 / dist));
+        el.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      });
+    }
+
+    // ══════════════════════════════════════════════════════
+    // POPUP
+    // ══════════════════════════════════════════════════════
+    const overlay = document.getElementById('popup-overlay');
+
+    function openPopup(i) {
+      const d = drones[i];
+      document.getElementById('popup-model').textContent = d.model;
+      document.getElementById('popup-brand-name').textContent = d.brand;
+      document.getElementById('popup-city').textContent = d.city;
+      document.getElementById('popup-coords').textContent = `${d.lat.toFixed(2)}°, ${d.lng.toFixed(2)}°`;
+      document.getElementById('s-speed').textContent = d.speed;
+      document.getElementById('s-time').textContent = d.flightTime;
+      document.getElementById('s-range').textContent = d.range;
+      document.getElementById('s-cam').textContent = d.camera;
+      document.getElementById('s-count').textContent = d.count + ' drones';
+
+      const badge = document.getElementById('popup-status-badge');
+      badge.className = 'ACTIVE';
+      badge.classList.add(d.status);
+      document.getElementById('popup-status-text').textContent = d.status;
+
+      const heroImg = droneImages[d.brand] || droneImages['Inspire'];
+      document.getElementById('popup-hero').src = heroImg;
+      document.getElementById('popup-hero').onerror = function () {
+        this.src = '';
+      };
+
+      const logoEl = document.getElementById('popup-brand-logo');
+      logoEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(d.brand)}&background=0a1628&color=00D4FF&size=80&font-size=0.35&bold=true`;
+      logoEl.alt = d.brand + ' logo';
+
+      overlay.classList.add('active');
+    }
+
+    function closePopup(e) {
+      if (e.target === overlay) overlay.classList.remove('active');
+    }
+    function closePopupBtn() { overlay.classList.remove('active'); }
+
+    // ══════════════════════════════════════════════════════
+    // STATUS BAR
+    // ══════════════════════════════════════════════════════
+    function updateStatusBar() {
+      const totalDrones = drones.reduce((sum, d) => sum + (d.count || 1), 0);
+      const activeCities = drones.filter(d => d.status === 'ACTIVE').length;
+      document.getElementById('active-count').textContent = `${totalDrones} (${activeCities} cities)`;
+      const now = new Date();
+      document.getElementById('timestamp').textContent = now.toLocaleTimeString('en-US', { hour12: false });
+    }
+    setInterval(updateStatusBar, 60000);
+
+    // ══════════════════════════════════════════════════════
+    // MOUSE / TOUCH CONTROLS
+    // ══════════════════════════════════════════════════════
+    let isDragging = false;
+    let prevMouse = { x: 0, y: 0 };
+    let velocity = { x: 0, y: 0 };
+    let autoRotate = true;
+
+    canvas.addEventListener('mousedown', e => {
+      isDragging = true; autoRotate = false;
+      prevMouse = { x: e.clientX, y: e.clientY };
+      velocity = { x: 0, y: 0 };
+    });
+    window.addEventListener('mousemove', e => {
+      if (!isDragging || !globeMesh) return;
+      const dx = e.clientX - prevMouse.x;
+      const dy = e.clientY - prevMouse.y;
+      globeMesh.rotation.y += dx * 0.005;
+      globeMesh.rotation.x += dy * 0.005;
+      velocity = { x: dx * 0.005, y: dy * 0.005 };
+      prevMouse = { x: e.clientX, y: e.clientY };
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    // Scroll zoom
+    canvas.addEventListener('wheel', e => {
+      camera.position.z = Math.max(1.4, Math.min(6, camera.position.z + e.deltaY * 0.004));
+    }, { passive: true });
+
+    // Touch support
+    let lastTouch = null, lastPinchDist = null;
+    canvas.addEventListener('touchstart', e => {
+      isDragging = true; autoRotate = false;
+      if (e.touches.length === 1) lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      if (e.touches.length === 2) lastPinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    }, { passive: true });
+    canvas.addEventListener('touchmove', e => {
+      if (!globeMesh) return;
+      if (e.touches.length === 1 && lastTouch) {
+        const dx = e.touches[0].clientX - lastTouch.x;
+        const dy = e.touches[0].clientY - lastTouch.y;
+        globeMesh.rotation.y += dx * 0.005;
+        globeMesh.rotation.x += dy * 0.005;
+        lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }
+      if (e.touches.length === 2 && lastPinchDist) {
+        const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        camera.position.z = Math.max(1.4, Math.min(6, camera.position.z - (d - lastPinchDist) * 0.01));
+        lastPinchDist = d;
+      }
+    }, { passive: true });
+    canvas.addEventListener('touchend', () => { isDragging = false; lastTouch = null; lastPinchDist = null; });
+
+    // ══════════════════════════════════════════════════════
+    // RESIZE
+    // ══════════════════════════════════════════════════════
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ══════════════════════════════════════════════════════
+    // ANIMATION LOOP
+    // ══════════════════════════════════════════════════════
+    function animate() {
+      requestAnimationFrame(animate);
+      if (globeMesh) {
+        if (autoRotate) {
+          globeMesh.rotation.y += 0.0012;
+        } else if (!isDragging) {
+          // Inertia
+          velocity.x *= 0.94;
+          velocity.y *= 0.94;
+          globeMesh.rotation.y += velocity.x;
+          globeMesh.rotation.x += velocity.y;
+          if (Math.abs(velocity.x) < 0.0001 && Math.abs(velocity.y) < 0.0001) autoRotate = true;
+        }
+        // Clamp vertical rotation
+        globeMesh.rotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, globeMesh.rotation.x));
+      }
+      updateMarkers();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // ══════════════════════════════════════════════════════
+    // HIDE LOADER
+    // ══════════════════════════════════════════════════════
+    function hideLoader() {
+      const el = document.getElementById('loading');
+      el.style.opacity = '0';
+      setTimeout(() => el.style.display = 'none', 800);
+    }
+
+    // ══════════════════════════════════════════════════════
+    // NAV TOGGLE
+    // ══════════════════════════════════════════════════════
+    function toggleNav() {
+      document.getElementById('nav-links').classList.toggle('open');
+    }
+
+    // Simulate loading progress
+    let prog = 10;
+    const progInterval = setInterval(() => {
+      prog = Math.min(prog + Math.random() * 15, 90);
+      loadBar.style.width = prog + '%';
+      if (prog >= 90) clearInterval(progInterval);
+    }, 250);
+  </script>
+</body>
+
+</html>

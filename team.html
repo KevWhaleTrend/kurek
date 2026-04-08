@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DRONENAV — Team</title>
+  <meta name="description" content="Meet the specialists behind DRONENAV's global drone operations fleet." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --neon: #00D4FF;
+      --neon2: #0066FF;
+      --bg: #020812;
+      --surface: #0f1629;
+      --border: rgba(0, 212, 255, 0.20);
+      --border-h: rgba(0, 212, 255, 0.80);
+      --text: #e8edf5;
+      --muted: #8892a4;
+    }
+
+    /* ── BASE ── */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── SCANLINES OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 212, 255, 0.012) 2px,
+          rgba(0, 212, 255, 0.012) 4px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── GRID BG PATTERN ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAVBAR ── */
+    #navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      background: linear-gradient(180deg, rgba(2, 8, 18, 0.97) 0%, rgba(2, 8, 18, 0.0) 100%);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    #logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      color: var(--neon);
+      text-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+      text-decoration: none;
+    }
+
+    #logo svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    nav a {
+      color: rgba(255, 255, 255, 0.65);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      transition: all 0.25s;
+    }
+
+    nav a:hover {
+      color: var(--neon);
+      border-color: var(--border);
+      background: rgba(0, 212, 255, 0.05);
+      text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    }
+
+    nav a.active {
+      color: var(--neon);
+      border-color: rgba(0, 212, 255, 0.4);
+      background: rgba(0, 212, 255, 0.08);
+      text-shadow: 0 0 12px rgba(0, 212, 255, 0.6);
+    }
+
+    #hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    #hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--neon);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    /* ── HERO HEADER ── */
+    #hero {
+      position: relative;
+      padding: 140px 32px 80px;
+      text-align: center;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    /* Radial glow behind heading */
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 300px;
+      background: radial-gradient(ellipse, rgba(0, 212, 255, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      color: var(--neon);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      opacity: 0.8;
+    }
+
+    #hero h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      color: #fff;
+      text-shadow: 0 0 40px rgba(0, 212, 255, 0.35);
+      margin-bottom: 20px;
+      line-height: 1.1;
+    }
+
+    #hero h1 span {
+      color: var(--neon);
+      text-shadow: 0 0 30px rgba(0, 212, 255, 0.7);
+    }
+
+    #hero p {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    /* Decorative line */
+    .hero-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin: 32px auto 0;
+      max-width: 320px;
+    }
+
+    .hero-line::before,
+    .hero-line::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--neon), transparent);
+      opacity: 0.4;
+    }
+
+    .hero-line-diamond {
+      width: 6px;
+      height: 6px;
+      background: var(--neon);
+      transform: rotate(45deg);
+      box-shadow: 0 0 10px var(--neon);
+    }
+
+    /* Stats row */
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      margin-top: 48px;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--neon);
+      text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+    }
+
+    .stat-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── MAIN CONTENT ── */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 32px 120px;
+    }
+
+    /* Section label */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .section-header::before {
+      content: '';
+      width: 4px;
+      height: 28px;
+      background: linear-gradient(180deg, var(--neon), var(--neon2));
+      border-radius: 2px;
+      box-shadow: 0 0 12px rgba(0, 212, 255, 0.5);
+    }
+
+    .section-header h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* ── CARDS GRID ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    /* ── TEAM CARD ── */
+    .team-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px 28px;
+      transition: border-color 0.35s, box-shadow 0.35s, transform 0.35s;
+      opacity: 0;
+      transform: translateY(28px);
+      will-change: opacity, transform;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Top-right corner accent */
+    .team-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(225deg, rgba(0, 212, 255, 0.08), transparent);
+      border-radius: 0 12px 0 0;
+      pointer-events: none;
+    }
+
+    .team-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.6s ease, transform 0.6s ease,
+        border-color 0.35s, box-shadow 0.35s;
+    }
+
+    .team-card:hover {
+      border-color: var(--border-h);
+      box-shadow: 0 0 30px rgba(0, 212, 255, 0.12), 0 8px 40px rgba(0, 0, 0, 0.4);
+      transform: translateY(-4px);
+    }
+
+    /* Avatar */
+    .avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      border: 2px solid var(--neon);
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.45), inset 0 0 12px rgba(0, 212, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.08), rgba(0, 30, 60, 0.8));
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Photo inside avatar */
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Rotating ring around avatar */
+    .avatar::after {
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      border: 1px dashed rgba(0, 212, 255, 0.25);
+      animation: spin 12s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .avatar-initials {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--neon);
+      letter-spacing: 0.05em;
+      text-shadow: 0 0 12px rgba(0, 212, 255, 0.7);
+    }
+
+    /* Role badge */
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      background: rgba(0, 212, 255, 0.10);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--neon);
+      margin-bottom: 20px;
+    }
+
+    .role-badge-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--neon);
+      box-shadow: 0 0 6px var(--neon);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.3
+      }
+    }
+
+    /* Bio */
+    .card-bio {
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 20px;
+    }
+
+    /* Highlights */
+    .highlights {
+      list-style: none;
+      margin-bottom: 24px;
+    }
+
+    .highlights li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.55);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .highlights li::before {
+      content: '›';
+      color: var(--neon);
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: -1px;
+    }
+
+    /* Divider */
+    .card-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 20px 0;
+    }
+
+    /* Section title inside card */
+    .card-section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--neon);
+      opacity: 0.7;
+      margin-bottom: 12px;
+    }
+
+    /* Experience */
+    .experience-list {
+      list-style: none;
+    }
+
+    .exp-item {
+      margin-bottom: 12px;
+      padding-left: 14px;
+      border-left: 2px solid rgba(0, 212, 255, 0.2);
+      transition: border-color 0.2s;
+    }
+
+    .team-card:hover .exp-item {
+      border-left-color: rgba(0, 212, 255, 0.45);
+    }
+
+    .exp-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .exp-company {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .exp-dates {
+      font-size: 0.7rem;
+      color: rgba(136, 146, 164, 0.65);
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 0.04em;
+    }
+
+    /* Certifications */
+    .cert-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .cert-tag {
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: rgba(0, 102, 255, 0.10);
+      border: 1px solid rgba(0, 102, 255, 0.25);
+      font-size: 0.65rem;
+      font-weight: 500;
+      color: #90b8ff;
+      letter-spacing: 0.04em;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .cert-tag:hover {
+      background: rgba(0, 212, 255, 0.12);
+      border-color: rgba(0, 212, 255, 0.4);
+      color: var(--neon);
+    }
+
+    /* ── STATUS BAR ── */
+    #status-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      background: linear-gradient(0deg, rgba(2, 8, 18, 0.97) 0%, rgba(2, 8, 18, 0) 100%);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--border);
+      z-index: 100;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #00FF88;
+      box-shadow: 0 0 8px #00FF88;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    .status-val {
+      color: var(--neon);
+      font-weight: 600;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.7rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+
+      #navbar {
+        padding: 0 16px;
+      }
+
+      #hero {
+        padding: 120px 20px 60px;
+      }
+
+      main {
+        padding: 0 20px 100px;
+      }
+
+      nav {
+        display: none;
+        flex-direction: column;
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: rgba(2, 8, 18, 0.98);
+        padding: 16px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      nav.open {
+        display: flex;
+      }
+
+      nav a {
+        width: 100%;
+        padding: 10px 16px;
+      }
+
+      #hamburger {
+        display: flex;
+      }
+
+      #status-bar {
+        padding: 0 16px;
+      }
+
+      .hero-stats {
+        gap: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <header id="navbar">
+    <a href="index.html" id="logo">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 10 L16 4 L24 10 L24 22 L16 28 L8 22 Z" stroke="#00D4FF" stroke-width="1.5"
+          fill="rgba(0,212,255,0.08)" />
+        <circle cx="16" cy="16" r="3" fill="#00D4FF" />
+        <path d="M4 16 L12 16 M20 16 L28 16 M16 4 L16 12 M16 20 L16 28" stroke="#00D4FF" stroke-width="1"
+          opacity="0.5" />
+      </svg>
+      DRONENAV
+    </a>
+    <div id="hamburger" onclick="toggleNav()">
+      <span></span><span></span><span></span>
+    </div>
+    <nav id="nav-links">
+      <a href="index.html">Map</a>
+      <a href="team.html" class="active">Team</a>
+      <a href="litepaper.html">Litepaper</a>
+    </nav>
+  </header>
+
+  <!-- ── HERO ── -->
+  <section id="hero">
+    <div class="hero-eyebrow">◈ DRONENAV OPERATIONS</div>
+    <h1>TEAM <span>OVERVIEW</span></h1>
+    <p>The specialists behind our drone operations — engineering, piloting, and technology excellence at scale.</p>
+    <div class="hero-line">
+      <div class="hero-line-diamond"></div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Core Specialists</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">15+</div>
+        <div class="stat-label">Years Combined Exp.</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">9</div>
+        <div class="stat-label">Certifications</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">8</div>
+        <div class="stat-label">Global Zones</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MAIN CARDS ── -->
+  <main>
+    <div class="section-header">
+      <h2>Core Team Members</h2>
+    </div>
+
+    <div class="cards-grid">
+
+      <!-- ── CARD 1: Aerospace Engineer ── -->
+      <article class="team-card" data-delay="0">
+        <div class="avatar"><img src="IMG/ADAM1.jpeg" alt="Aerospace Engineer"/></div>
+        <div class="role-badge">
+          <div class="role-badge-dot"></div>Aerospace Engineer
+        </div>
+        <p class="card-bio">
+          Experienced Aerospace Engineer with 5+ years of experience in aircraft systems, aerodynamics, and performance
+          optimization.
+        </p>
+        <ul class="highlights">
+          <li>Worked on design and analysis of flight systems</li>
+          <li>Strong background in CFD and structural analysis</li>
+        </ul>
+
+        <div class="card-divider"></div>
+
+        <div class="card-section-title">— Experience</div>
+        <ul class="experience-list">
+          <li class="exp-item">
+            <div class="exp-title">Senior Aerospace Engineer</div>
+            <div class="exp-company">Advanced Aviation Solutions</div>
+            <div class="exp-dates">2021 — Present</div>
+          </li>
+          <li class="exp-item">
+            <div class="exp-title">Aerospace Engineer</div>
+            <div class="exp-company">SkyTech Dynamics</div>
+            <div class="exp-dates">2019 — 2021</div>
+          </li>
+        </ul>
+
+        <div class="card-divider"></div>
+
+        <div class="card-section-title">— Certifications</div>
+        <div class="cert-tags">
+          <span class="cert-tag">Certified Aerospace Systems Engineer (CASE)</span>
+          <span class="cert-tag">ANSYS Fluent</span>
+          <span class="cert-tag">MATLAB & Simulink</span>
+        </div>
+      </article>
+
+      <!-- ── CARD 2: Drone Operator ── -->
+      <article class="team-card" data-delay="120">
+        <div class="avatar"><img src="IMG/ADAM2.jpeg" alt="Drone Operator"/></div>
+        <div class="role-badge">
+          <div class="role-badge-dot"></div>Drone Operator
+        </div>
+        <p class="card-bio">
+          Professional Drone Operator with 5+ years of hands-on experience in aerial operations, mapping, and
+          surveillance.
+        </p>
+        <ul class="highlights">
+          <li>Specialized in autonomous flight missions and real-time data capture</li>
+          <li>Experience in both commercial and technical drone deployments</li>
+        </ul>
+
+        <div class="card-divider"></div>
+
+        <div class="card-section-title">— Experience</div>
+        <ul class="experience-list">
+          <li class="exp-item">
+            <div class="exp-title">Lead Drone Operator</div>
+            <div class="exp-company">AeroVision Tech</div>
+            <div class="exp-dates">2021 — Present</div>
+          </li>
+          <li class="exp-item">
+            <div class="exp-title">UAV Specialist</div>
+            <div class="exp-company">SkyScan Solutions</div>
+            <div class="exp-dates">2019 — 2021</div>
+          </li>
+        </ul>
+
+        <div class="card-divider"></div>
+
+        <div class="card-section-title">— Certifications</div>
+        <div class="cert-tags">
+          <span class="cert-tag">FAA Part 107 Remote Pilot</span>
+          <span class="cert-tag">Advanced UAV Operations</span>
+          <span class="cert-tag">Aerial Mapping & Photogrammetry</span>
+        </div>
+      </article>
+
+      <!-- ── CARD 3: Software Engineer ── -->
+      <article class="team-card" data-delay="240">
+        <div class="avatar"><img src="IMG/ADAM3.jpeg" alt="Software Engineer"/></div>
+        <div class="role-badge">
+          <div class="role-badge-dot"></div>Software Engineer
+        </div>
+        <p class="card-bio">
+          Software Engineer with 5+ years of experience in building scalable systems, data analysis tools, and AI-driven
+          applications.
+        </p>
+        <ul class="highlights">
+          <li>Focused on backend systems, data pipelines, and automation</li>
+          <li>Experience with blockchain data and real-time analytics</li>
+        </ul>
+
+        <div class="card-divider"></div>
+
+        <div class="card-section-title">— Experience</div>
+        <ul class="experience-list">
+          <li class="exp-item">
+            <div class="exp-title">Senior Software Engineer</div>
+            <div class="exp-company">DataCore Systems</div>
+            <div class="exp-dates">2021 — Present</div>
+          </li>
+          <li class="exp-item">
+            <div class="exp-title">Software Engineer</div>
+            <div class="exp-company">NexaTech Labs</div>
+            <div class="exp-dates">2019 — 2021</div>
+          </li>
+        </ul>
+
+        <div class="card-divider"></div>
+
+        <div class="card-section-title">— Certifications</div>
+        <div class="cert-tags">
+          <span class="cert-tag">AWS Solutions Architect</span>
+          <span class="cert-tag">Python Professional</span>
+          <span class="cert-tag">Machine Learning (Stanford)</span>
+        </div>
+      </article>
+
+    </div><!-- /cards-grid -->
+  </main>
+
+  <!-- ── STATUS BAR ── -->
+  <footer id="status-bar">
+    <div class="status-item">
+      <div class="status-dot"></div>
+      <span>System Online</span>
+    </div>
+    <div class="status-item">
+      <span>Team Members:</span>
+      <span class="status-val">3</span>
+    </div>
+    <div class="status-item">
+      <span>Last Updated:</span>
+      <span class="status-val" id="timestamp">—</span>
+    </div>
+  </footer>
+
+  <script>
+    // ── Timestamp ──────────────────────────────────────────
+    function updateTime() {
+      document.getElementById('timestamp').textContent =
+        new Date().toLocaleTimeString('en-US', { hour12: false });
+    }
+    updateTime();
+    setInterval(updateTime, 60000);
+
+    // ── Nav toggle ─────────────────────────────────────────
+    function toggleNav() {
+      document.getElementById('nav-links').classList.toggle('open');
+    }
+
+    // ── IntersectionObserver — fade-in cards ───────────────
+    const cards = document.querySelectorAll('.team-card');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const delay = parseInt(entry.target.dataset.delay) || 0;
+          setTimeout(() => entry.target.classList.add('visible'), delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    cards.forEach(card => observer.observe(card));
+  </script>
+</body>
+
+</html>

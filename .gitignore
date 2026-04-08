@@ -1,0 +1,7 @@
+# Video dosyaları — GitHub 100MB limitini aşıyor
+IMG/*.mp4
+IMG/*.MP4
+
+# OS
+.DS_Store
+Thumbs.db
