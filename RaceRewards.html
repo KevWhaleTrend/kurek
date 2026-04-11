@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VOIDYACHT — VoidYacht Protocol | Race. Earn. Evolve.</title>
+    <meta name="description"
+        content="VoidYacht is the world's first crypto-powered RC yacht racing protocol. Deploy your VoidAgent, race on real water, and earn $VOID tokens." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=DM+Mono:wght@300;400;500&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="shared.css" />
+    <link rel="stylesheet" href="simulation.css" />
+
+</head>
+
+<body>
+
+
+    <!-- Navigation -->
+    <nav class="vy-nav" id="vy-nav">
+        <a href="Home.html" class="vy-nav-logo">VoidYacht</a>
+        <ul class="vy-nav-links">
+            <li><a href="Home.html">Home</a></li>
+            <li><a href="index.html">Mint</a></li>
+            <li><a href="RaceRewards.html" class="active">Race Rewards</a></li>
+            <li><a href="litepaper.html">Litepaper</a></li>
+            <li><a href="instructions.html">Instructions</a></li>
+        </ul>
+        <div class="vy-nav-right">
+            <a href="https://x.com" target="_blank" rel="noopener" class="vy-nav-social" title="Follow on X"
+                aria-label="X">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                    <path
+                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+            </a>
+            <a href="https://app.virtuals.io" target="_blank" rel="noopener" class="vy-nav-social"
+                title="Virtuals Protocol" aria-label="Virtuals">
+                <img src="IMG/virtuals.png" alt="Virtuals" class="vy-nav-virtuals-img" />
+            </a>
+        </div>
+    </nav>
+
+    <div id="cursor">
+        <svg id="cursor-crosshair" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="5" stroke="#00C4A1" stroke-width="1.5" />
+            <line x1="12" y1="0" x2="12" y2="7" stroke="#00C4A1" stroke-width="1.5" />
+            <line x1="12" y1="17" x2="12" y2="24" stroke="#00C4A1" stroke-width="1.5" />
+            <line x1="0" y1="12" x2="7" y2="12" stroke="#00C4A1" stroke-width="1.5" />
+            <line x1="17" y1="12" x2="24" y2="12" stroke="#00C4A1" stroke-width="1.5" />
+        </svg>
+        <svg id="cursor-boat" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+            <ellipse cx="20" cy="22" rx="8" ry="14" fill="#00C4A1" opacity="0.9" />
+            <polygon points="20,4 26,20 14,20" fill="#7EEEDD" />
+            <ellipse cx="20" cy="28" rx="12" ry="5" fill="rgba(0,196,161,0.2)" />
+        </svg>
+    </div>
+    <div id="cursor-trail"></div>
+
+    <div id="boat-tooltip">
+        <h4 id="tt-name">YACHT #01</h4>
+        <div class="tooltip-row"><span>Speed</span><span id="tt-speed">42 km/h</span></div>
+        <div class="tooltip-row"><span>Lap</span><span id="tt-lap">2 / 5</span></div>
+        <div class="tooltip-row"><span>Token</span><span id="tt-token">$VOID</span></div>
+    </div>
+
+
+
+    <!-- ═══════════════════════════════════════════════════════ HERO ═══ -->
+    <section id="hero">
+        <canvas id="pond-canvas"></canvas>
+        <div id="caustics-overlay"></div>
+
+        <div class="hero-content">
+
+            <h1 class="hero-title">VOID</h1>
+            <p class="hero-tagline">
+                <span class="tagline-word">Race.</span>
+                <span class="tagline-word hero-divider">·</span>
+                <span class="tagline-word">Earn.</span>
+                <span class="tagline-word hero-divider">·</span>
+                <span class="tagline-word">Evolve.</span>
+            </p>
+            <div class="hero-actions">
+                <a href="#how-it-works" class="btn-primary">Launch Your VoidAgent</a>
+                <a href="#tokenomics" class="btn-outline">$VOID Token</a>
+            </div>
+        </div>
+
+        <div class="hero-scroll-hint">
+            <span>Scroll to explore</span>
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════ FLEET ═══ -->
+
+    <section id="fleet" style="background: var(--color-bg-primary); padding: 4rem 2rem;">
+        <div class="container">
+            <p class="section-label reveal">// THE VOIDYACHT FLEET</p>
+            <h2 class="section-title reveal">Model Comparison</h2>
+            <p class="section-sub reveal" style="margin-bottom:3rem;">9 distinct yachts offering varied top speeds,
+                token earnings, and telemetry profiles. Build your ultimate racing lineup.</p>
+
+            <div class="fleet-grid reveal">
+                <div class="fleet-card">
+                    <div class="fleet-img"><img src="img/traxxas_spartan_sr_1775857541261.png" alt="AEGIS ROYALE">
+                    </div>
+                    <div class="fleet-info">
+                        <h3>AEGIS ROYALE</h3>
+                        <div class="fleet-specs">
+                            <div><strong>TYPE</strong>Deep-V</div>
+                            <div><strong>SPEED</strong>80+ km/h</div>
+                            <div><strong>HULL</strong>Injection-molded ABS</div>
+                            <div><strong>DIMENSIONS</strong>36.5" × 9.5"</div>
+                            <div><strong>MOTOR</strong>Velineon 540XL</div>
+                            <div><strong>ESC</strong>VXL-6s Marine</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fleet-card">
+                    <div class="fleet-img"><img src="img/sonicwake_v2_1775857554888.png" alt="EMBER STORM"></div>
+                    <div class="fleet-info">
+                        <h3>EMBER STORM</h3>
+                        <div class="fleet-specs">
+                            <div><strong>TYPE</strong>Deep-V</div>
+                            <div><strong>SPEED</strong>80+ km/h</div>
+                            <div><strong>HULL</strong>High-impact ABS</div>
+                            <div><strong>DIMENSIONS</strong>36" × 10.75"</div>
+                            <div><strong>MOTOR</strong>Spektrum 1900Kv</div>
+                            <div><strong>ESC</strong>Spektrum 160A</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fleet-card">
+                    <div class="fleet-img"><img src="img/blackjack_42_1775857571041.png" alt="INFERNO BLADE"></div>
+                    <div class="fleet-info">
+                        <h3>INFERNO BLADE</h3>
+                        <div class="fleet-specs">
+                            <div><strong>TYPE</strong>Catamaran</div>
+                            <div><strong>SPEED</strong>90+ km/h</div>
+                            <div><strong>HULL</strong>Fiberglass</div>
+                            <div><strong>DIMENSIONS</strong>42" × 15"</div>
+                            <div><strong>MOTOR</strong>Spektrum 4985 1350Kv</div>
+                            <div><strong>ESC</strong>Spektrum 160A</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fleet-card">
+                    <div class="fleet-img"><img src="img/zonda_29_1775857584871.png" alt="ARCTIC SPECTER"></div>
+                    <div class="fleet-info">
+                        <h3>ARCTIC SPECTER</h3>
+                        <div class="fleet-specs">
+                            <div><strong>TYPE</strong>Catamaran</div>
+                            <div><strong>SPEED</strong>90+ km/h</div>
+                            <div><strong>HULL</strong>Hand-laid Fiberglass</div>
+                            <div><strong>DIMENSIONS</strong>29" × 8.2"</div>
+                            <div><strong>MOTOR</strong>2× 2900Kv</div>
+                            <div><strong>ESC</strong>2× 120A</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fleet-card">
+                    <div class="fleet-img"><img src="img/rocket_v2_1775857599473.png" alt="HAZARD VIPER"></div>
+                    <div class="fleet-info">
+                        <h3>HAZARD VIPER</h3>
+                        <div class="fleet-specs">
+                            <div><strong>TYPE</strong>Deep-V</div>
+                            <div><strong>SPEED</strong>80+ km/h</div>
+                            <div><strong>HULL</strong>Fiberglass</div>
+                            <div><strong>DIMENSIONS</strong>24.4" × 6.1"</div>
+                            <div><strong>MOTOR</strong>3660 Brushless</div>
+                            <div><strong>ESC</strong>60A Water-cooled</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fleet-card">
+                    <div class="fleet-img"><img src="img/jetstream_888ve_1775857614168.png" alt="ABYSS PHANTOM">
+                    </div>
+                    <div class="fleet-info">
+                        <h3>ABYSS PHANTOM</h3>
+                        <div class="fleet-specs">
+                            <div><strong>TYPE</strong>Deep-V</div>
+                            <div><strong>SPEED</strong>80 km/h</div>
+                            <div><strong>HULL</strong>FRP</div>
+                            <div><strong>DIMENSIONS</strong>35.4" × 7.3"</div>
+                            <div><strong>MOTOR</strong>Orion Outrunner</div>
+                            <div><strong>ESC</strong>80A Water-cooled</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fleet-card">
+                    <div class="fleet-img"><img src="img/pursuit_32_1775857629922.png" alt="VOID SOVEREIGN"></div>
+                    <div class="fleet-info">
+                        <h3>VOID SOVEREIGN</h3>
+                        <div class="fleet-specs">
+                            <div><strong>TYPE</strong>Deep-V</div>
+                            <div><strong>SPEED</strong>90+ km/h</div>
+                            <div><strong>HULL</strong>Hand-laid Fiberglass</div>
+                            <div><strong>DIMENSIONS</strong>32.2" × 9.4"</div>
+                            <div><strong>MOTOR</strong>3660 1620Kv</div>
+                            <div><strong>ESC</strong>120A</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fleet-card">
+                    <div class="fleet-img"><img src="img/zelos_36_1775857647736.png" alt="NEON FURY"></div>
+                    <div class="fleet-info">
+                        <h3>NEON FURY</h3>
+                        <div class="fleet-specs">
+                            <div><strong>TYPE</strong>Catamaran</div>
+                            <div><strong>SPEED</strong>96+ km/h</div>
+                            <div><strong>HULL</strong>Fiberglass</div>
+                            <div><strong>DIMENSIONS</strong>36" × 11.7"</div>
+                            <div><strong>MOTOR</strong>2× 2000Kv 6-Pole</div>
+                            <div><strong>ESC</strong>2× 120A</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fleet-card">
+                    <div class="fleet-img"><img src="img/traxxas_m41.png" alt="ECLIPSE WRAITH"></div>
+                    <div class="fleet-info">
+                        <h3>ECLIPSE WRAITH</h3>
+                        <div class="fleet-specs">
+                            <div><strong>TYPE</strong>Catamaran</div>
+                            <div><strong>SPEED</strong>80+ km/h</div>
+                            <div><strong>HULL</strong>Vacuum-molded ABS</div>
+                            <div><strong>DIMENSIONS</strong>40.5" × 10.5"</div>
+                            <div><strong>MOTOR</strong>Velineon 540XL</div>
+                            <div><strong>ESC</strong>VXL-6s Marine</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═════════════════════════════════════ LIVE DASHBOARD ═══ -->
+    <section id="dashboard">
+        <div class="container">
+            <p class="section-label reveal">// LIVE TELEMETRY</p>
+            <h2 class="section-title reveal">Weekly Race Dashboard</h2>
+            <p class="section-sub reveal" style="margin-bottom:3rem;">Watch live telemetry stream from active races.
+                GPS,
+                speed, lap times, and token earnings all updating in real-time.</p>
+
+            <div class="dashboard-card reveal"
+                style="min-height: 500px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: rgba(0, 196, 161, 0.02); border: 1px dashed rgba(0, 196, 161, 0.1);">
+                <div
+                    style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(0, 196, 161, 0.08) 0%, transparent 70%); animation: pulse-bg 8s infinite alternate;">
+                </div>
+                <div style="position: relative; z-index: 10; text-align: center; padding: 40px;">
+                    <div
+                        style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-accent-primary); letter-spacing: 0.4em; text-transform: uppercase; margin-bottom: 24px; opacity: 0.8;">
+                        Status: <span style="animation: blink 1s infinite;">CALIBRATING DATA...</span>
+                    </div>
+                    <h2
+                        style="font-family: var(--font-display); font-size: clamp(3.5rem, 12vw, 7rem); font-weight: 300; letter-spacing: -0.01em; margin-bottom: 24px; line-height: 0.9;">
+                        COMING <span style="color: var(--color-accent-primary); font-style: italic;">SOON!</span>
+                    </h2>
+                    <p
+                        style="color: var(--color-text-muted); max-width: 500px; margin: 0 auto 40px; font-size: 1.1rem; line-height: 1.6;">
+                        Our global telemetry synchronization and automated race verification systems are being prepared
+                        for the next season.
+                    </p>
+                    <div style="display: flex; gap: 20px; justify-content: center; height: 40px;">
+                        <!-- Button removed as per request -->
+                    </div>
+                </div>
+                <div
+                    style="position: absolute; inset: 0; background-image: radial-gradient(rgba(0, 196, 161, 0.1) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.2;">
+                </div>
+            </div>
+
+
+        </div>
+    </section>
+
+
+
+
+    <!-- CTA section removed -->
+
+    <!-- Footer -->
+    <footer class="vy-footer">
+        <div class="footer-brand-wrap">
+            <span class="vy-footer-logo">VoidYacht</span>
+            <span class="vy-footer-copy">&copy; 2026 VoidYacht Protocol</span>
+        </div>
+        <div class="footer-center-divider"></div>
+        <div class="footer-socials">
+            <a href="https://x.com" target="_blank" rel="noopener" class="footer-social-link" title="Follow on X">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                    <path
+                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+            </a>
+            <a href="https://app.virtuals.io" target="_blank" rel="noopener" class="footer-social-link"
+                title="Virtuals Protocol">
+                <img src="IMG/virtuals.png" alt="Virtuals Protocol" />
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        /* ──────────────────────────────────────────────────────────────────
+           CURSOR
+        ──────────────────────────────────────────────────────────────────── */
+        const cursor = document.getElementById('cursor');
+        const cursorTrail = document.getElementById('cursor-trail');
+        const cursorCrosshair = document.getElementById('cursor-crosshair');
+        const cursorBoat = document.getElementById('cursor-boat');
+        let mouseX = 0, mouseY = 0, trailX = 0, trailY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX; mouseY = e.clientY;
+            cursor.style.left = mouseX + 'px';
+            cursor.style.top = mouseY + 'px';
+        });
+
+        function animateTrail() {
+            trailX += (mouseX - trailX) * 0.12;
+            trailY += (mouseY - trailY) * 0.12;
+            cursorTrail.style.left = trailX + 'px';
+            cursorTrail.style.top = trailY + 'px';
+            requestAnimationFrame(animateTrail);
+        }
+        animateTrail();
+
+        const heroSection = document.getElementById('hero');
+        heroSection.addEventListener('mouseenter', () => {
+            cursor.classList.add('boat-mode');
+            cursorCrosshair.style.display = 'none';
+            cursorBoat.style.display = 'block';
+        });
+        heroSection.addEventListener('mouseleave', () => {
+            cursor.classList.remove('boat-mode');
+            cursorCrosshair.style.display = 'block';
+            cursorBoat.style.display = 'none';
+        });
+
+        /* ──────────────────────────────────────────────────────────────────
+           SCROLL PROGRESS
+        ──────────────────────────────────────────────────────────────────── */
+        const scrollBar = document.getElementById('scroll-progress');
+        window.addEventListener('scroll', () => {
+            const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+            scrollBar.style.width = pct + '%';
+        });
+
+        /* ──────────────────────────────────────────────────────────────────
+           NAV SCROLL
+        ──────────────────────────────────────────────────────────────────── */
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('scrolled', window.scrollY > 80);
+        });
+
+        /* ──────────────────────────────────────────────────────────────────
+           REVEAL ON SCROLL
+        ──────────────────────────────────────────────────────────────────── */
+        const revealEls = document.querySelectorAll('.reveal');
+        const revealObs = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => entry.target.classList.add('visible'), i * 80);
+                }
+            });
+        }, { threshold: 0.1 });
+        revealEls.forEach(el => revealObs.observe(el));
+
+        /* ──────────────────────────────────────────────────────────────────
+           POND CANVAS — WATER + BOATS
+        ──────────────────────────────────────────────────────────────────── */
+        const canvas = document.getElementById('pond-canvas');
+        const ctx = canvas.getContext('2d');
+        let W, H;
+
+        function resize() {
+            W = canvas.width = canvas.offsetWidth;
+            H = canvas.height = canvas.offsetHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        /* --- Bezier race track path (control points in unit space 0..1) --- */
+        const trackPts = [
+            [0.5, 0.2], [0.75, 0.25], [0.82, 0.45], [0.75, 0.65],
+            [0.55, 0.78], [0.35, 0.78], [0.2, 0.65], [0.18, 0.45],
+            [0.25, 0.28], [0.5, 0.2]
+        ];
+
+        function getTrackPoint(t) {
+            const pts = trackPts;
+            const n = pts.length - 1;
+            const i = Math.floor(t * n);
+            const f = (t * n) - i;
+            const p0 = pts[Math.max(0, i - 1)];
+            const p1 = pts[i];
+            const p2 = pts[Math.min(n, i + 1)];
+            const p3 = pts[Math.min(n, i + 2)];
+            // Catmull-Rom
+            const x = 0.5 * ((2 * p1[0]) + (-p0[0] + p2[0]) * f + (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * f * f + (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * f * f * f);
+            const y = 0.5 * ((2 * p1[1]) + (-p0[1] + p2[1]) * f + (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * f * f + (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * f * f * f);
+            return [x * W, y * H];
+        }
+
+        /* --- Buoy positions --- */
+        const buoyPositions = [0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9];
+
+        /* --- Boats --- */
+        const boats = [
+            { t: 0.0, speed: 0.00080, color: '#1E90FF', name: 'AEGIS ROYALE', token: 'VOID-01', lap: 3 },
+            { t: 0.11, speed: 0.00080, color: '#00FA9A', name: 'EMBER STORM', token: 'VOID-02', lap: 3 },
+            { t: 0.22, speed: 0.00090, color: '#FF3366', name: 'INFERNO BLADE', token: 'VOID-03', lap: 2 },
+            { t: 0.33, speed: 0.00090, color: '#8A2BE2', name: 'ARCTIC SPECTER', token: 'VOID-04', lap: 2 },
+            { t: 0.44, speed: 0.00080, color: '#FFD700', name: 'HAZARD VIPER', token: 'VOID-05', lap: 2 },
+            { t: 0.55, speed: 0.00080, color: '#00Bfff', name: 'ABYSS PHANTOM', token: 'VOID-06', lap: 1 },
+            { t: 0.66, speed: 0.00090, color: '#FF8C00', name: 'VOID SOVEREIGN', token: 'VOID-07', lap: 1 },
+            { t: 0.77, speed: 0.00096, color: '#32CD32', name: 'NEON FURY ', token: 'VOID-08', lap: 1 },
+            { t: 0.88, speed: 0.00080, color: '#FF4500', name: 'ECLIPSE WRAITH', token: 'VOID-09', lap: 1 },
+        ];
+        const wakes = boats.map(() => []);
+        const WAKE_LEN = 30;
+
+        /* --- Water shimmer particles --- */
+        const shimmerPts = [];
+        for (let i = 0; i < 60; i++) {
+            shimmerPts.push({ x: Math.random(), y: Math.random(), r: Math.random() * 2 + 0.5, phase: Math.random() * Math.PI * 2, speed: Math.random() * 0.5 + 0.2 });
+        }
+
+        /* --- Lily pad positions --- */
+        const lilyPads = [
+            [0.05, 0.15], [0.12, 0.7], [0.88, 0.2], [0.92, 0.72],
+            [0.5, 0.92], [0.1, 0.45], [0.9, 0.5]
+        ];
+
+        let frame = 0;
+
+        /* --- Tooltip --- */
+        const tooltip = document.getElementById('boat-tooltip');
+        const ttName = document.getElementById('tt-name');
+        const ttSpeed = document.getElementById('tt-speed');
+        const ttLap = document.getElementById('tt-lap');
+        const ttToken = document.getElementById('tt-token');
+        let hoveredBoat = null;
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            hoveredBoat = null;
+            for (const b of boats) {
+                const [bx, by] = getTrackPoint(b.t);
+                const dist = Math.hypot(mx - bx, my - by);
+                if (dist < 20) { hoveredBoat = b; break; }
+            }
+            if (hoveredBoat) {
+                tooltip.style.opacity = '1';
+                tooltip.style.left = (e.clientX + 20) + 'px';
+                tooltip.style.top = (e.clientY - 20) + 'px';
+                ttName.textContent = hoveredBoat.name;
+                ttSpeed.textContent = Math.round(hoveredBoat.speed * 100000) + ' km/h';
+                ttLap.textContent = hoveredBoat.lap + ' / 5';
+                ttToken.textContent = hoveredBoat.token;
+            } else {
+                tooltip.style.opacity = '0';
+            }
+        });
+
+        function drawFrame(ts) {
+            frame = ts * 0.001;
+            ctx.clearRect(0, 0, W, H);
+
+            /* --- Water background gradient --- */
+            const grad = ctx.createRadialGradient(W * 0.45, H * 0.45, W * 0.05, W * 0.5, H * 0.5, W * 0.85);
+            grad.addColorStop(0, '#0e4f62');
+            grad.addColorStop(0.3, '#0a3a4e');
+            grad.addColorStop(0.7, '#082d3d');
+            grad.addColorStop(1, '#061A24');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+
+            /* --- Sunlight streak across surface --- */
+            const streak = ctx.createLinearGradient(W * 0.2, H * 0.15, W * 0.75, H * 0.6);
+            streak.addColorStop(0, 'rgba(126,238,221,0)');
+            streak.addColorStop(0.4, 'rgba(126,238,221,0.04)');
+            streak.addColorStop(0.5, 'rgba(200,255,245,0.07)');
+            streak.addColorStop(0.6, 'rgba(126,238,221,0.04)');
+            streak.addColorStop(1, 'rgba(126,238,221,0)');
+            ctx.fillStyle = streak;
+            ctx.fillRect(0, 0, W, H);
+
+            /* --- Shimmer/caustic highlights --- */
+            shimmerPts.forEach(sp => {
+                const ox = (Math.sin(frame * sp.speed + sp.phase) * 0.025);
+                const oy = (Math.cos(frame * sp.speed * 0.7 + sp.phase) * 0.018);
+                const px = (sp.x + ox) * W;
+                const py = (sp.y + oy) * H;
+                const alpha = (Math.sin(frame * sp.speed * 2 + sp.phase) * 0.5 + 0.5) * 0.22;
+                ctx.beginPath();
+                ctx.arc(px, py, sp.r * (2.5 + Math.sin(frame * sp.speed)), 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(126, 238, 221, ${alpha})`;
+                ctx.fill();
+            });
+
+            /* --- Horizontal wave lines for water texture --- */
+            const waveCount = 18;
+            for (let w = 0; w < waveCount; w++) {
+                const wy = H * (0.1 + w / waveCount * 0.85);
+                const amp = 3 + Math.sin(w * 1.3) * 2;
+                const speed = 0.4 + w * 0.03;
+                const offset = Math.sin(frame * speed + w * 0.7) * amp;
+                const alpha = 0.04 + Math.sin(frame * 0.3 + w) * 0.015;
+                ctx.beginPath();
+                for (let x = 0; x <= W; x += 6) {
+                    const y = wy + Math.sin(x * 0.018 + frame * speed + w) * amp + offset;
+                    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                }
+                ctx.strokeStyle = `rgba(0, 196, 161, ${Math.max(0, alpha)})`;
+                ctx.lineWidth = 0.8;
+                ctx.stroke();
+            }
+
+            /* --- Wave rings radiating from center --- */
+            for (let r = 0; r < 5; r++) {
+                const radius = ((frame * 55 + r * 70) % 380);
+                const alpha = Math.max(0, 0.22 - radius / 1700);
+                ctx.beginPath();
+                ctx.arc(W * 0.5, H * 0.5, radius, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(0, 196, 161, ${alpha})`;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+
+            /* --- Enhanced Lily pads --- */
+            lilyPads.forEach(([lx, ly], idx) => {
+                const px = lx * W, py = ly * H;
+                const padSize = 14 + Math.sin(frame * 0.3 + idx) * 1;
+                ctx.save();
+                ctx.translate(px, py);
+
+                /* pad body */
+                ctx.beginPath();
+                ctx.arc(0, 0, padSize, 0.25, Math.PI * 2 - 0.25);
+                ctx.fillStyle = 'rgba(14, 90, 48, 0.72)';
+                ctx.fill();
+                /* pad rim */
+                ctx.strokeStyle = 'rgba(30, 160, 80, 0.4)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                /* pad slot */
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, padSize, -0.12, 0.12);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(0, 30, 15, 0.5)';
+                ctx.fill();
+                /* pad vein */
+                ctx.beginPath();
+                ctx.moveTo(-padSize * 0.9, 0);
+                ctx.lineTo(0, 0);
+                ctx.strokeStyle = 'rgba(30, 160, 80, 0.25)';
+                ctx.lineWidth = 0.8;
+                ctx.stroke();
+
+                /* --- FROG sitting on lily pad (every other pad) --- */
+                if (idx % 2 === 0) {
+                    const blink = (Math.floor(frame * 2 + idx * 7)) % 50 < 2;
+                    const frogBob = Math.sin(frame * 1.5 + idx) * 1.5;
+                    ctx.translate(0, -padSize * 0.2 + frogBob);
+
+                    /* frog body */
+                    ctx.beginPath();
+                    ctx.ellipse(0, 2, 7, 5.5, 0, 0, Math.PI * 2);
+                    ctx.fillStyle = '#2d8a45';
+                    ctx.fill();
+                    /* body sheen */
+                    ctx.beginPath();
+                    ctx.ellipse(-1, 0, 3, 2.5, -0.3, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(80,200,100,0.25)';
+                    ctx.fill();
+
+                    /* frog head */
+                    ctx.beginPath();
+                    ctx.ellipse(0, -4, 6, 5, 0, 0, Math.PI * 2);
+                    ctx.fillStyle = '#35a352';
+                    ctx.fill();
+
+                    /* eyes */
+                    [-3.5, 3.5].forEach(ex => {
+                        ctx.beginPath();
+                        ctx.arc(ex, -6.5, 2.5, 0, Math.PI * 2);
+                        ctx.fillStyle = '#3dba5f';
+                        ctx.fill();
+                        if (!blink) {
+                            ctx.beginPath();
+                            ctx.arc(ex, -6.5, 1.2, 0, Math.PI * 2);
+                            ctx.fillStyle = '#0a1a0a';
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.arc(ex + 0.4, -7, 0.4, 0, Math.PI * 2);
+                            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                            ctx.fill();
+                        } else {
+                            /* blink line */
+                            ctx.beginPath();
+                            ctx.moveTo(ex - 2, -6.5);
+                            ctx.lineTo(ex + 2, -6.5);
+                            ctx.strokeStyle = '#0a1a0a';
+                            ctx.lineWidth = 1.2;
+                            ctx.stroke();
+                        }
+                    });
+
+                    /* frog mouth */
+                    ctx.beginPath();
+                    ctx.arc(0, -3, 2.5, 0.15, Math.PI - 0.15);
+                    ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+                    ctx.lineWidth = 0.8;
+                    ctx.stroke();
+
+                    /* front legs */
+                    [[-5, 3], [5, 3]].forEach(([lx2, ly2]) => {
+                        ctx.beginPath();
+                        ctx.moveTo(lx2 * 0.6, 2);
+                        ctx.quadraticCurveTo(lx2, 5, lx2, ly2 + 2);
+                        ctx.strokeStyle = '#2d8a45';
+                        ctx.lineWidth = 2;
+                        ctx.lineCap = 'round';
+                        ctx.stroke();
+                    });
+
+                    /* ripple under frog */
+                    const ripAlpha = 0.15 + Math.sin(frame * 2 + idx) * 0.05;
+                    ctx.beginPath();
+                    ctx.ellipse(0, 6, 9, 3, 0, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(0,196,161,${ripAlpha})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+
+                ctx.restore();
+            });
+
+            /* --- Race track dashes & buoys --- */
+            ctx.save();
+            ctx.setLineDash([8, 12]);
+            ctx.strokeStyle = 'rgba(0,196,161,0.25)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let i = 0; i <= 200; i++) {
+                const [x, y] = getTrackPoint(i / 200);
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.restore();
+
+            /* Buoys */
+            buoyPositions.forEach(bt => {
+                const [bx, by] = getTrackPoint(bt);
+                const pulse = Math.sin(frame * 3 + bt * 10) * 0.5 + 0.5;
+                ctx.beginPath();
+                ctx.arc(bx, by, 4 + pulse * 2, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 107, 53, ${0.5 + pulse * 0.5})`;
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(bx, by, 8 + pulse * 4, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(255, 107, 53, ${0.2 * pulse})`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+
+            /* --- Update boat positions --- */
+            boats.forEach((boat, bi) => {
+                boat.t += boat.speed;
+                if (boat.t >= 1) { boat.t -= 1; boat.lap = Math.min(5, boat.lap + 1); }
+                const pos = getTrackPoint(boat.t);
+                wakes[bi].push([...pos]);
+                if (wakes[bi].length > WAKE_LEN) wakes[bi].shift();
+            });
+
+            /* --- Draw wakes --- */
+            boats.forEach((boat, bi) => {
+                const wake = wakes[bi];
+                if (wake.length < 3) return;
+                const [cx, cy] = wake[wake.length - 1];
+                const [px, py] = wake.length > 2 ? wake[wake.length - 2] : [cx, cy];
+                const angle = Math.atan2(cy - py, cx - px);
+                const perpX = Math.cos(angle + Math.PI / 2);
+                const perpY = Math.sin(angle + Math.PI / 2);
+
+                for (let side = -1; side <= 1; side += 2) {
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    for (let i = wake.length - 1; i >= 0; i--) {
+                        const frac = (wake.length - 1 - i) / WAKE_LEN;
+                        const spread = frac * 18 * side;
+                        ctx.lineTo(wake[i][0] + perpX * spread, wake[i][1] + perpY * spread);
+                    }
+                    ctx.strokeStyle = `rgba(255,255,255,${0.12 - (wake.length / WAKE_LEN) * 0.08})`;
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+            });
+
+            /* --- Draw boats --- */
+            boats.forEach((boat) => {
+                const [bx, by] = getTrackPoint(boat.t);
+                const [px, py] = getTrackPoint(boat.t - 0.005 < 0 ? boat.t - 0.005 + 1 : boat.t - 0.005);
+                const angle = Math.atan2(by - py, bx - px);
+
+                ctx.save();
+                ctx.translate(bx, by);
+                ctx.rotate(angle);
+
+                /* Hull */
+                ctx.beginPath();
+                ctx.moveTo(14, 0);
+                ctx.quadraticCurveTo(6, -5, -10, -3);
+                ctx.lineTo(-10, 3);
+                ctx.quadraticCurveTo(6, 5, 14, 0);
+                ctx.fillStyle = boat.color;
+                ctx.fill();
+
+                /* Cockpit */
+                ctx.beginPath();
+                ctx.ellipse(2, 0, 4, 2.5, 0, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.fill();
+
+                /* Glow */
+                ctx.shadowColor = boat.color;
+                ctx.shadowBlur = 12;
+                ctx.beginPath();
+                ctx.moveTo(14, 0);
+                ctx.quadraticCurveTo(6, -5, -10, -3);
+                ctx.lineTo(-10, 3);
+                ctx.quadraticCurveTo(6, 5, 14, 0);
+                ctx.strokeStyle = boat.color;
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+
+                ctx.restore();
+            });
+
+            requestAnimationFrame(drawFrame);
+        }
+        requestAnimationFrame(drawFrame);
+
+
+
+
+
+        /* ── FULL-PAGE OVERLAY ── */
+        const _burger = document.getElementById('burger-main');
+        const _overlay = document.getElementById('fullnav-overlay');
+        const _fnTheme = document.getElementById('fn-theme-btn');
+        if (_burger && _overlay) {
+            _burger.addEventListener('click', () => {
+                const isOpen = _overlay.classList.toggle('open');
+                _burger.classList.toggle('open', isOpen);
+                document.body.style.overflow = isOpen ? 'hidden' : '';
+            });
+            _overlay.querySelectorAll('.nav-item').forEach(link => {
+                link.addEventListener('click', () => {
+                    _overlay.classList.remove('open');
+                    _burger.classList.remove('open');
+                    document.body.style.overflow = '';
+                });
+            });
+        }
+        if (_fnTheme) {
+            _fnTheme.addEventListener('click', () => {
+                const root = document.documentElement;
+                root.getAttribute('data-theme') === 'light' ? root.removeAttribute('data-theme') : root.setAttribute('data-theme', 'light');
+            });
+        }
+
+        /* ── LOADER LOGIC ── */
+        document.body.classList.add("loading");
+        const _lc = document.getElementById("loader-content");
+        const _ll = document.getElementById("loader-line");
+        setTimeout(() => {
+            if (_lc) _lc.style.opacity = '1';
+            setTimeout(() => {
+                if (_ll) _ll.style.width = '100%';
+                setTimeout(() => {
+                    document.body.classList.remove("loading");
+                    document.body.classList.add("loaded");
+                    // Remove loader entirely after animation
+                    setTimeout(() => { const el = document.getElementById('loader'); if (el) el.style.display = 'none'; }, 800);
+                }, 600);
+            }, 200);
+        }, 50);
+
+        document.querySelectorAll('a[href]').forEach(a => {
+            a.addEventListener('click', e => {
+                try {
+                    const tgt = new URL(a.href, window.location.href);
+                    if (tgt.hostname === window.location.hostname && tgt.pathname !== window.location.pathname && !a.hasAttribute('target')) {
+                        e.preventDefault();
+                        document.body.classList.remove('loaded');
+                        document.body.classList.add('navigating');
+                        setTimeout(() => { window.location.href = a.href; }, 700);
+                    }
+                } catch (err) { }
+            });
+        });
+    </script>
+
+    <script src="shared.js"></script>
+</body>
+
+</html>

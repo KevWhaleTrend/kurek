@@ -1,0 +1,342 @@
+/* instructions.css */
+
+/* ── INSTRUCTIONS-SPECIFIC STYLES ── */
+    h1 {
+      font-size: clamp(4rem, 10vw, 8rem);
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      margin-bottom: 20px;
+    }
+
+    h1 em, h2 em {
+      font-style: italic;
+    }
+
+    /* ── HERO ── */
+    .instr-hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 100vh;
+      padding: 120px 50px 0;
+      max-width: 1400px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .instr-hero-left {
+      max-width: 55%;
+      z-index: 2;
+    }
+
+    .instr-hero-right {
+      position: absolute;
+      right: -10%;
+      top: 15%;
+      width: 65%;
+      opacity: 0.7;
+      mix-blend-mode: luminosity;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .instr-hero-right img {
+      width: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.6));
+      transform: rotate(-3deg);
+      transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.5s;
+    }
+
+    .instr-hero:hover .instr-hero-right img {
+      transform: rotate(0deg) scale(1.02);
+      mix-blend-mode: normal;
+      opacity: 1;
+    }
+
+    .instr-hero-tag {
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    /* ── HOW IT WORKS (3D BOOK) ── */
+    .instr-hiw-section {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 80px;
+      position: relative;
+      padding: 160px 50px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .instr-hiw-text {
+      flex: 1;
+      max-width: 450px;
+    }
+
+    .instr-book-container {
+      flex: 1.2;
+      perspective: 2500px;
+      position: relative;
+      height: 500px;
+      width: 100%;
+    }
+
+    .instr-book-3d {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+    }
+
+    .instr-step-page {
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 60px 50px;
+      transform-origin: left center;
+      transition: transform 0.9s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.9s ease;
+      box-shadow: 20px 20px 60px rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .instr-step-num {
+      font-family: var(--font-sans);
+      font-size: 1.1rem;
+      color: var(--accent);
+      margin-bottom: 25px;
+      display: block;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 15px;
+    }
+
+    .instr-step-page h3 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    .instr-step-page.step-active {
+      transform: rotateY(0deg) translateZ(0);
+      opacity: 1;
+      z-index: 10;
+      pointer-events: auto;
+    }
+
+    .instr-step-page.step-past {
+      transform: rotateY(-100deg) translateZ(60px);
+      opacity: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .instr-step-page.step-next {
+      transform: rotateY(0deg) translateZ(-30px) translateX(30px);
+      opacity: 1;
+      z-index: 8;
+      background: var(--surface);
+      border-color: rgba(255, 255, 255, 0.03);
+    }
+
+    .instr-step-page.step-future {
+      transform: rotateY(0deg) translateZ(-60px) translateX(60px);
+      opacity: 1;
+      z-index: 7;
+      background: var(--surface-deep);
+      border-color: rgba(255, 255, 255, 0.01);
+    }
+
+    .instr-step-controls {
+      position: absolute;
+      bottom: -80px;
+      left: 0;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .instr-btn-flip {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+
+    .instr-btn-flip:hover:not(:disabled) {
+      background: var(--text-main);
+      color: var(--bg);
+    }
+
+    .instr-btn-flip:disabled {
+      opacity: 0.2;
+      cursor: not-allowed;
+    }
+
+    .instr-step-indicator {
+      font-family: var(--font-sans);
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* ── FLEET SECTION ── */
+    .instr-fleet-section {
+      position: relative;
+      padding: 160px 50px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .instr-fleet-asym {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin-top: 80px;
+      align-items: start;
+    }
+
+    .instr-f-item {
+      position: relative;
+      transition: transform 0.5s ease;
+      width: 100%;
+    }
+
+    .instr-f-item img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      mix-blend-mode: luminosity;
+      opacity: 0.5;
+      border: 1px solid var(--border);
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .instr-f-item:hover img {
+      mix-blend-mode: normal;
+      opacity: 1;
+      transform: scale(1.02) translateY(-5px);
+      border-color: var(--accent);
+    }
+
+    .instr-f-item:hover { z-index: 10; }
+
+    .instr-f-lbl {
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-top: 20px;
+      border-top: 1px solid var(--border);
+      padding-top: 15px;
+      color: var(--accent);
+    }
+
+    .instr-f-1, .instr-f-2, .instr-f-3 { position: relative; top: auto; left: auto; right: auto; z-index: 1; }
+
+    /* ── TOKENOMICS ── */
+    .instr-tok-section {
+      position: relative;
+      padding: 160px 50px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .instr-tok-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 100px;
+      border-top: 1px solid var(--border);
+      padding-top: 60px;
+    }
+
+    .instr-tok-stat { text-align: left; }
+
+    .instr-tok-val {
+      font-family: var(--font-serif);
+      font-size: clamp(3rem, 6vw, 6rem);
+      font-weight: 300;
+      line-height: 1;
+      color: var(--text-main);
+    }
+
+    .instr-tok-lbl {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 15px;
+      display: block;
+    }
+
+    .instr-watermark {
+      position: absolute;
+      top: 5%;
+      left: -2%;
+      font-family: var(--font-serif);
+      font-size: clamp(8rem, 25vw, 24rem);
+      color: var(--text-main);
+      opacity: 0.03;
+      z-index: -1;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .instr-hero {
+        flex-direction: column;
+        text-align: center;
+        justify-content: center;
+        padding-top: 160px;
+      }
+
+      .instr-hero-left { max-width: 100%; }
+
+      .instr-hero-right {
+        position: relative;
+        width: 100%;
+        right: 0;
+        top: 0;
+        margin-top: 60px;
+      }
+
+      .instr-hiw-section { flex-direction: column; align-items: flex-start; gap: 40px; }
+      .instr-hiw-text { max-width: 100%; }
+      .instr-book-container { width: 100%; height: 400px; margin-top: 40px; }
+
+      .instr-fleet-asym {
+        display: flex;
+        flex-direction: column;
+        gap: 60px;
+        min-height: auto;
+        margin-top: 60px;
+      }
+
+      .instr-f-item { position: static; width: 100%; }
+
+      .instr-tok-flex { flex-direction: column; align-items: flex-start; gap: 50px; }
+    }

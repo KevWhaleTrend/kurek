@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoidYacht — Instructions</title>
+  <meta name="description" content="Deploy your VoidYacht, race on real water, and earn $VOID tokens." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <link rel="stylesheet" href="instructions.css" />
+</head>
+
+<body>
+
+  <!-- LOADER -->
+  <div id="vy-loader">
+    <div id="vy-loader-top"></div>
+    <div id="vy-loader-bottom"></div>
+    <div id="vy-loader-content">
+      <div id="vy-loader-logo">VoidYacht</div>
+      <div id="vy-loader-line-wrap">
+        <div id="vy-loader-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="vy-nav" id="vy-nav">
+    <a href="Home.html" class="vy-nav-logo">VoidYacht</a>
+    <ul class="vy-nav-links">
+      <li><a href="Home.html">Home</a></li>
+      <li><a href="index.html">Mint</a></li>
+      <li><a href="RaceRewards.html">Race Rewards</a></li>
+      <li><a href="litepaper.html">Litepaper</a></li>
+      <li><a href="instructions.html" class="active">Instructions</a></li>
+    </ul>
+    <div class="vy-nav-right">
+      <a href="https://x.com" target="_blank" rel="noopener" class="vy-nav-social" title="Follow on X" aria-label="X">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+          <path
+            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+        </svg>
+      </a>
+      <a href="https://app.virtuals.io" target="_blank" rel="noopener" class="vy-nav-social" title="Virtuals Protocol"
+        aria-label="Virtuals">
+        <img src="IMG/virtuals.png" alt="Virtuals" class="vy-nav-virtuals-img" />
+      </a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="instr-hero">
+    <div class="instr-hero-left">
+      <span class="instr-hero-tag">VOIDYACHT PROTOCOL</span>
+      <h1><em>Elevating</em> Physical Velocity</h1>
+      <p>Merging high-speed RC boat racing with on-chain telemetry. Deploy your VoidYacht, race on real water, and
+        harvest $VOID tokens.</p>
+      <a href="#how-it-works" class="vy-btn">Enter the Fleet</a>
+    </div>
+    <div class="instr-hero-right">
+      <img src="img/blackjack_42_1775857571041.png" alt="VoidYacht RC Boat" />
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works" class="instr-hiw-section">
+    <div class="instr-watermark">STEPS</div>
+    <div class="instr-hiw-text">
+      <h2><em>How</em> VoidYacht Works</h2>
+      <p>Three steps from wallet to waterway. Deploy, race, and harvest on-chain rewards all from the comfort of your
+        browser.</p>
+    </div>
+
+    <div class="instr-book-container">
+      <div class="instr-book-3d">
+        <div class="instr-step-page step-active" onclick="instrFlipTo(0)">
+          <span class="instr-step-num">STEP 01</span>
+          <h3>Deploy VoidYacht</h3>
+          <p>Mint your VoidYacht NFT, configure racing parameters, and deploy your autonomous RC yacht controller
+            on-chain.</p>
+        </div>
+        <div class="instr-step-page step-next" onclick="instrFlipTo(1)">
+          <span class="instr-step-num">STEP 02</span>
+          <h3>Race &amp; Earn</h3>
+          <p>Your VoidYacht competes in real-time pond races. Finish positions unlock $VOID token rewards and
+            leaderboard XP.</p>
+        </div>
+        <div class="instr-step-page step-future" onclick="instrFlipTo(2)">
+          <span class="instr-step-num">STEP 03</span>
+          <h3>Data Marketplace</h3>
+          <p>Every race generates telemetry data. Sell your yacht's performance logs on the VoidYacht data marketplace
+            for passive income.</p>
+        </div>
+      </div>
+      <div class="instr-step-controls">
+        <button class="instr-btn-flip" id="instr-btn-prev" onclick="instrFlipAct(-1)">&#9664;</button>
+        <span class="instr-step-indicator" id="instr-step-indicator">01 / 03</span>
+        <button class="instr-btn-flip" id="instr-btn-next" onclick="instrFlipAct(1)">&#9654;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLEET -->
+  <section id="fleet" class="instr-fleet-section">
+    <div class="instr-watermark">FLEET</div>
+    <h2><em>Curated</em> Lineup</h2>
+
+    <div class="instr-fleet-asym">
+      <div class="instr-f-item instr-f-1">
+        <img src="img/sonicwake_v2_1775857554888.png" alt="VoidYacht Fleet 1" />
+        <div class="instr-f-lbl">EMBER STORM</div>
+      </div>
+      <div class="instr-f-item instr-f-2">
+        <img src="img/rocket_v2_1775857599473.png" alt="VoidYacht Fleet 2" />
+        <div class="instr-f-lbl">HAZARD VIPER</div>
+      </div>
+      <div class="instr-f-item instr-f-3">
+        <img src="img/traxxas_spartan_sr_1775857541261.png" alt="VoidYacht Fleet 3" />
+        <div class="instr-f-lbl">AEGIS ROYALE</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ECONOMICS -->
+  <section id="tokenomics" class="instr-tok-section">
+    <div class="instr-watermark">$VOID</div>
+    <h2><em></em> Tokenomics</h2>
+    <p>The $VOID token is the lifeblood connecting pilots, spectators, and data buyers. It powers the ecosystem
+      sustainably through utility, not speculation.</p>
+
+    <div class="instr-tok-flex">
+      <div class="instr-tok-stat">
+        <div class="instr-tok-val">1B</div>
+        <span class="instr-tok-lbl">Total Supply</span>
+      </div>
+      <div class="instr-tok-stat">
+        <div class="instr-tok-val">40%</div>
+        <span class="instr-tok-lbl">Race Yield</span>
+      </div>
+      <div class="instr-tok-stat">
+        <div class="instr-tok-val">BASE</div>
+        <span class="instr-tok-lbl">Network Layer</span>
+      </div>
+    </div>
+  </section>
+
+  <footer class="vy-footer">
+    <div class="footer-brand-wrap">
+      <span class="vy-footer-logo">VoidYacht</span>
+      <span class="vy-footer-copy">&copy; 2026 VoidYacht Protocol</span>
+    </div>
+    <div class="footer-center-divider"></div>
+    <div class="footer-socials">
+      <a href="https://x.com" target="_blank" rel="noopener" class="footer-social-link" title="Follow on X">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+          <path
+            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+        </svg>
+      </a>
+      <a href="https://app.virtuals.io" target="_blank" rel="noopener" class="footer-social-link"
+        title="Virtuals Protocol">
+        <img src="IMG/virtuals.png" alt="Virtuals Protocol" />
+      </a>
+    </div>
+  </footer>
+
+  <script>
+    // ── 3D BOOK LOGIC ──
+    let instrStep = 0;
+    const instrSteps = document.querySelectorAll('.instr-step-page');
+    const instrIndicator = document.getElementById('instr-step-indicator');
+    const instrPrev = document.getElementById('instr-btn-prev');
+    const instrNext = document.getElementById('instr-btn-next');
+
+    function instrRender() {
+      instrSteps.forEach((s, i) => {
+        s.className = 'instr-step-page';
+        if (i === instrStep) s.classList.add('step-active');
+        else if (i < instrStep) s.classList.add('step-past');
+        else if (i === instrStep + 1) s.classList.add('step-next');
+        else s.classList.add('step-future');
+      });
+      instrIndicator.textContent = `0${instrStep + 1} / 0${instrSteps.length}`;
+      instrPrev.disabled = instrStep === 0;
+      instrNext.disabled = instrStep === instrSteps.length - 1;
+    }
+
+    function instrFlipAct(dir) {
+      if (dir === 1 && instrStep < instrSteps.length - 1) instrStep++;
+      else if (dir === -1 && instrStep > 0) instrStep--;
+      instrRender();
+    }
+
+    function instrFlipTo(i) {
+      if (i > instrStep) { instrStep = i; instrRender(); }
+    }
+
+    instrRender();
+  </script>
+
+  <script src="shared.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoidYacht — Race. Earn. Evolve.</title>
+  <meta name="description" content="Deploy your VoidAgent, race on real water, and earn $VOID tokens." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #061A24;
+      --text-main: #F0EDE6;
+      --text-muted: rgba(240, 237, 230, 0.6);
+      --accent: #00C4A1;
+      --border: rgba(255, 255, 255, 0.08);
+      --watermark: rgba(255, 255, 255, 0.02);
+      --bg-surface: rgba(255, 255, 255, 0.03);
+      --bg-surface-dark: rgba(255, 255, 255, 0.015);
+      color-scheme: dark;
+    }
+
+    html[data-theme="light"] {
+      --bg: #F7F4EE;
+      --text-main: #1A2A2F;
+      --text-muted: rgba(26, 42, 47, 0.7);
+      --accent: #0E6B5E;
+      --border: rgba(26, 42, 47, 0.08);
+      --watermark: rgba(26, 42, 47, 0.04);
+      --bg-surface: rgba(26, 42, 47, 0.04);
+      --bg-surface-dark: rgba(26, 42, 47, 0.02);
+      color-scheme: light;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    h1,
+    h2,
+    h3,
+    .logo {
+      font-family: 'Editorial New', 'Fraunces', serif;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(4rem, 10vw, 8rem);
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      margin-bottom: 20px;
+      line-height: 1.1;
+    }
+
+    h1 em,
+    h2 em {
+      font-style: italic;
+      color: var(--text-main);
+    }
+
+    p {
+      font-size: 1.15rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* ─── NAVBAR ─── */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 90px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 50px;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+      background: rgba(6, 26, 36, 0.85);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-size: 1.6rem;
+      color: var(--text-main);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      transition: color 0.3s;
+      position: relative;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-main);
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.4s ease;
+    }
+
+    .nav-links a:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 6px 16px;
+      border-radius: 40px;
+      font-family: inherit;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+      margin-left: 20px;
+    }
+
+    .theme-toggle:hover {
+      background: var(--text-main);
+      color: var(--bg);
+    }
+
+    .hamburger-btn {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 2000;
+      padding: 10px;
+      margin-left: 10px;
+    }
+
+    .hamburger-btn span {
+      display: block;
+      width: 25px;
+      height: 2px;
+      background: var(--text-main);
+      transition: 0.3s;
+    }
+
+    .side-drawer {
+      position: fixed;
+      top: 0;
+      right: -320px;
+      width: 320px;
+      height: 100vh;
+      background: var(--bg);
+      border-left: 1px solid var(--border);
+      z-index: 1500;
+      transition: right 0.4s ease;
+      display: flex;
+      flex-direction: column;
+      padding: 100px 40px;
+      gap: 30px;
+    }
+
+    .side-drawer.open {
+      right: 0;
+    }
+
+    .side-drawer a {
+      font-size: 1.4rem;
+      color: var(--text-main);
+      text-decoration: none;
+      font-family: 'Editorial New', 'Fraunces', serif;
+      transition: color 0.3s;
+    }
+
+    .side-drawer a:hover {
+      color: var(--accent);
+    }
+
+    /* ─── SHARED SECTION ─── */
+    .premium-section {
+      position: relative;
+      padding: 160px 50px;
+      max-width: 1300px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .watermark-bg {
+      position: absolute;
+      top: 5%;
+      left: -2%;
+      font-family: inherit;
+      font-size: clamp(8rem, 25vw, 24rem);
+      color: var(--watermark);
+      z-index: -1;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ─── PREMIUM BUTTON ─── */
+    .premium-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 50px;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      font-size: 0.95rem;
+      transition: all 0.4s ease;
+      background: transparent;
+      cursor: pointer;
+      color: var(--text-main);
+      margin-top: 30px;
+    }
+
+    .premium-btn:hover {
+      background: var(--text-main);
+      color: var(--bg);
+      border-color: var(--text-main);
+    }
+
+    /* ─── HERO ─── */
+    .hero-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 100vh;
+      padding: 120px 50px 0;
+      max-width: 1400px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .h-left {
+      max-width: 55%;
+      z-index: 2;
+    }
+
+    .h-right {
+      position: absolute;
+      right: -10%;
+      top: 15%;
+      width: 65%;
+      opacity: 0.7;
+      mix-blend-mode: luminosity;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .h-right img {
+      width: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.6));
+      transform: rotate(-3deg);
+      transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1), mix-blend-mode 1.5s, opacity 1.5s;
+    }
+
+    .hero-wrapper:hover .h-right img {
+      transform: rotate(0deg) scale(1.02);
+      mix-blend-mode: normal;
+      opacity: 1;
+    }
+
+    .hero-tag {
+      font-family: 'DM Sans', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    /* ─── HOW IT WORKS (3D BOOK) ─── */
+    #how-it-works {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 80px;
+    }
+
+    .hiw-text {
+      flex: 1;
+      max-width: 450px;
+    }
+
+    .book-container {
+      flex: 1.2;
+      perspective: 2500px;
+      position: relative;
+      height: 500px;
+      width: 100%;
+    }
+
+    .book-3d {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+    }
+
+    .step-page {
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 60px 50px;
+      transform-origin: left center;
+      transition: transform 0.9s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.9s ease;
+      box-shadow: 20px 20px 60px rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .step-num {
+      font-family: 'DM Sans', monospace;
+      font-size: 1.1rem;
+      color: var(--accent);
+      margin-bottom: 25px;
+      display: block;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 15px;
+    }
+
+    .step-page h3 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    .step-page p {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+
+    /* Interactive Flip States */
+    .step-page.active {
+      transform: rotateY(0deg) translateZ(0);
+      opacity: 1;
+      z-index: 10;
+      pointer-events: auto;
+    }
+
+    .step-page.past {
+      transform: rotateY(-100deg) translateZ(60px);
+      opacity: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .step-page.next {
+      transform: rotateY(0deg) translateZ(-30px) translateX(30px);
+      opacity: 1;
+      z-index: 8;
+      background: var(--bg-surface);
+      border-color: rgba(255, 255, 255, 0.03);
+    }
+
+    .step-page.future {
+      transform: rotateY(0deg) translateZ(-60px) translateX(60px);
+      opacity: 1;
+      z-index: 7;
+      background: var(--bg-surface-dark);
+      border-color: rgba(255, 255, 255, 0.01);
+    }
+
+    .step-controls {
+      position: absolute;
+      bottom: -80px;
+      left: 0;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .btn-flip {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+
+    .btn-flip:hover:not(:disabled) {
+      background: var(--text-main);
+      color: var(--bg);
+    }
+
+    .btn-flip:disabled {
+      opacity: 0.2;
+      cursor: not-allowed;
+    }
+
+    #step-indicator {
+      font-family: 'DM Sans', monospace;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* ─── FLEET (Asymmetrical Offset) ─── */
+    .fleet-asym {
+      position: relative;
+      min-height: 700px;
+      margin-top: 80px;
+    }
+
+    .f-item {
+      position: absolute;
+      transition: transform 0.5s ease;
+      width: 450px;
+    }
+
+    .f-item img {
+      width: 100%;
+      object-fit: contain;
+      mix-blend-mode: luminosity;
+      opacity: 0.5;
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .f-item:hover img {
+      mix-blend-mode: normal;
+      opacity: 1;
+      transform: scale(1.08) translateY(-10px);
+    }
+
+    .f-item:hover {
+      z-index: 30 !important;
+    }
+
+    .f-lbl {
+      font-family: 'DM Sans', monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-top: 15px;
+      border-top: 1px solid var(--border);
+      padding-top: 15px;
+      color: var(--accent);
+    }
+
+    .f-1 {
+      top: 0;
+      left: 0;
+      z-index: 2;
+    }
+
+    .f-2 {
+      top: 120px;
+      right: 5%;
+      z-index: 1;
+    }
+
+    .f-3 {
+      top: 380px;
+      left: 25%;
+      z-index: 3;
+    }
+
+    .fleet-text {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      max-width: 350px;
+      text-align: right;
+    }
+
+    /* ─── DATA & TOKENOMICS ─── */
+    .tok-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 100px;
+      border-top: 1px solid var(--border);
+      padding-top: 60px;
+    }
+
+    .tok-stat {
+      text-align: left;
+    }
+
+    .tok-val {
+      font-family: 'Editorial New', 'Fraunces', serif;
+      font-size: clamp(3rem, 6vw, 6rem);
+      font-weight: 300;
+      line-height: 1;
+      color: var(--text-main);
+    }
+
+    .tok-lbl {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 15px;
+      display: block;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 50px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-top: 100px;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media(max-width: 1024px) {
+      .hero-wrapper {
+        flex-direction: column;
+        text-align: center;
+        justify-content: center;
+        padding-top: 160px;
+      }
+
+      .h-left {
+        max-width: 100%;
+      }
+
+      .h-right {
+        position: relative;
+        width: 100%;
+        right: 0;
+        top: 0;
+        margin-top: 60px;
+        pointer-events: auto;
+      }
+
+      .h-right img {
+        transform: rotate(0deg);
+        mix-blend-mode: normal;
+        opacity: 1;
+      }
+
+      #how-it-works {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 40px;
+      }
+
+      .hiw-text {
+        max-width: 100%;
+      }
+
+      .book-container {
+        width: 100%;
+        height: 400px;
+        margin-top: 40px;
+      }
+
+      .fleet-asym {
+        display: flex;
+        flex-direction: column;
+        gap: 60px;
+        min-height: auto;
+        margin-top: 60px;
+      }
+
+      .f-item {
+        position: static;
+        width: 50%;
+
+        .f-1 {
+          top: 0;
+          left: 0;
+          z-index: 2;
+        }
+
+        .f-2 {
+          top: 120px;
+          right: 5%;
+          z-index: 1;
+        }
+
+        .f-3 {
+          top: 380px;
+          left: 25%;
+          z-index: 3;
+        }
+      }
+
+      .fleet-text {
+        position: static;
+        text-align: left;
+        margin-top: 40px;
+      }
+
+      .tok-flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 50px;
+      }
+
+      nav {
+        padding: 0 20px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .theme-toggle {
+        display: none;
+      }
+
+      .hamburger-btn {
+        display: flex;
+      }
+
+      .premium-section {
+        padding: 100px 20px;
+      }
+  </style>
+  <style>
+    /* LOADER CSS */
+    #loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #loader-top,
+    #loader-bottom {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 50vh;
+      background: #000;
+      transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+    }
+
+    #loader-top {
+      top: 0;
+    }
+
+    #loader-bottom {
+      bottom: 0;
+    }
+
+    #loader-content {
+      position: relative;
+      z-index: 10001;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #loader-logo {
+      font-family: 'Editorial New', 'Fraunces', serif;
+      font-size: 32px;
+      color: #fff;
+      letter-spacing: 0.1em;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    #loader-line-wrapper {
+      width: 120px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+
+    #loader-line {
+      width: 0%;
+      height: 100%;
+      background: #00C4A1;
+      transition: width 0.6s ease;
+    }
+
+    body.loading>*:not(#loader) {
+      opacity: 0 !important;
+      transform: translateY(12px);
+    }
+
+    body>*:not(#loader) {
+      transition: opacity 0.7s ease 0.3s, transform 0.7s ease 0.3s;
+    }
+
+    body.loaded #loader-top {
+      transform: translateY(-100%);
+    }
+
+    body.loaded #loader-bottom {
+      transform: translateY(100%);
+    }
+
+    body.loaded #loader-content {
+      opacity: 0;
+    }
+
+    body.navigating #loader-top {
+      transform: translateY(0);
+    }
+
+    body.navigating #loader-bottom {
+      transform: translateY(0);
+    }
+
+    body.navigating>*:not(#loader) {
+      opacity: 0 !important;
+      transform: translateY(12px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    /* ── HAMBURGER ── */
+    .hamburger-btn {
+      display: flex !important;
+      flex-direction: column;
+      gap: 6px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 3000;
+      padding: 10px;
+      position: relative;
+    }
+
+    .hamburger-btn span {
+      display: block;
+      width: 26px;
+      height: 1.5px;
+      background: var(--text-main);
+      transition: transform 0.4s ease, opacity 0.4s ease;
+      transform-origin: center;
+    }
+
+    .hamburger-btn.open span:nth-child(1) {
+      transform: translateY(7.5px) rotate(45deg);
+    }
+
+    .hamburger-btn.open span:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+
+    .hamburger-btn.open span:nth-child(3) {
+      transform: translateY(-7.5px) rotate(-45deg);
+    }
+
+    /* ── FULL PAGE NAV OVERLAY ── */
+    .fullnav-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2500;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 0 8vw;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s;
+    }
+
+    .fullnav-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .fullnav-overlay .nav-item {
+      font-family: 'Editorial New', 'Fraunces', serif;
+      font-size: clamp(2.8rem, 7vw, 6rem);
+      font-weight: 300;
+      color: var(--text-main);
+      text-decoration: none;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.5s ease, transform 0.5s ease, color 0.3s ease;
+      display: block;
+    }
+
+    .fullnav-overlay.open .nav-item {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .fullnav-overlay.open .nav-item:nth-child(1) {
+      transition-delay: 0.10s;
+    }
+
+    .fullnav-overlay.open .nav-item:nth-child(2) {
+      transition-delay: 0.17s;
+    }
+
+    .fullnav-overlay.open .nav-item:nth-child(3) {
+      transition-delay: 0.24s;
+    }
+
+    .fullnav-overlay.open .nav-item:nth-child(4) {
+      transition-delay: 0.31s;
+    }
+
+    .fullnav-overlay.open .nav-item:nth-child(5) {
+      transition-delay: 0.38s;
+    }
+
+    .fullnav-overlay .nav-item:hover {
+      color: var(--accent);
+    }
+
+    .fullnav-bottom {
+      position: absolute;
+      bottom: 40px;
+      left: 8vw;
+      right: 8vw;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      opacity: 0;
+      transition: opacity 0.5s ease 0.4s;
+    }
+
+    .fullnav-overlay.open .fullnav-bottom {
+      opacity: 1;
+    }
+
+    .fn-theme {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 20px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.3s;
+    }
+
+    .fn-theme:hover {
+      background: var(--text-main);
+      color: var(--bg);
+    }
+
+    .fn-copy {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Nav bar minimal */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 90px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 50px;
+      z-index: 2900;
+      backdrop-filter: blur(12px);
+      background: rgba(6, 26, 36, 0.75);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.4s;
+    }
+
+    html[data-theme="light"] nav {
+      background: rgba(247, 244, 238, 0.85);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Loader -->
+  <div id="loader">
+    <div id="loader-top"></div>
+    <div id="loader-bottom"></div>
+    <div id="loader-content">
+      <div id="loader-logo">VOIDYACHT</div>
+      <div id="loader-line-wrapper">
+        <div id="loader-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <nav>
+    <a href="index.html" class="logo">VoidYacht</a>
+    <button class="hamburger-btn" id="burger-main"
+      aria-label="Open menu"><span></span><span></span><span></span></button>
+  </nav>
+
+  <!-- Full-Page Nav Overlay -->
+  <div class="fullnav-overlay" id="fullnav-overlay">
+    <a href="index.html" class="nav-item">Home</a>
+    <a href="simulation.html" class="nav-item">Simulation</a>
+    <a href="litepaper.html" class="nav-item">Litepaper</a>
+    <a href="#fleet" class="nav-item">Fleet</a>
+    <a href="#tokenomics" class="nav-item">Economics</a>
+    <div class="fullnav-bottom">
+      <button class="fn-theme" id="fn-theme-btn">Light / Dark</button>
+      <span class="fn-copy">&copy; 2025 VoidYacht Protocol</span>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero-wrapper">
+    <div class="h-left">
+      <span class="hero-tag">VOIDYACHT PROTOCOL</span>
+      <h1><em>Elevating</em> Physical Velocity</h1>
+      <p>Merging high-speed RC boat racing with on-chain telemetry. Deploy your VoidAgent, race on real water, and
+        harvest $VOID tokens.</p>
+      <a href="#how-it-works" class="premium-btn">Enter the Fleet</a>
+    </div>
+    <div class="h-right">
+      <img src="img/blackjack_42_1775857571041.png" alt="VoidYacht Blackjack 42">
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS (3D Book) -->
+  <section id="how-it-works" class="premium-section">
+    <div class="watermark-bg">STEPS</div>
+    <div class="hiw-text">
+      <h2><em>How</em> VoidYacht Works</h2>
+      <p>Three steps from wallet to waterway. Deploy, race, and harvest on-chain rewards — all from the comfort of your
+        browser.</p>
+    </div>
+
+    <div class="book-container">
+      <div class="book-3d">
+        <!-- Step 1 -->
+        <div class="step-page active" onclick="flipStep(0)">
+          <span class="step-num">STEP 01</span>
+          <h3>Deploy VoidAgent</h3>
+          <p>Mint your VoidAgent NFT, configure racing parameters, and deploy your autonomous RC yacht controller
+            on-chain.</p>
+        </div>
+        <!-- Step 2 -->
+        <div class="step-page next" onclick="flipStep(1)">
+          <span class="step-num">STEP 02</span>
+          <h3>Race &amp; Earn</h3>
+          <p>Your VoidAgent competes in real-time pond races. Finish positions unlock $VOID token rewards and
+            leaderboard XP.</p>
+        </div>
+        <!-- Step 3 -->
+        <div class="step-page future" onclick="flipStep(2)">
+          <span class="step-num">STEP 03</span>
+          <h3>Data Marketplace</h3>
+          <p>Every race generates telemetry data. Sell your yacht's performance logs on the VoidYacht data marketplace
+            for passive income.</p>
+        </div>
+      </div>
+      <div class="step-controls">
+        <button class="btn-flip" id="btn-prev" onclick="flipAct(-1)">&#9664;</button>
+        <span id="step-indicator">01 / 03</span>
+        <button class="btn-flip" id="btn-next" onclick="flipAct(1)">&#9654;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLEET ASYMMETRIC -->
+  <section id="fleet" class="premium-section">
+    <div class="watermark-bg" style="top: 20%; left: auto; right: -5%;">FLEET</div>
+    <h2><em>Curated</em> Lineup</h2>
+
+    <div class="fleet-asym">
+      <div class="f-item f-1">
+        <img src="img/sonicwake_v2_1775857554888.png" alt="Sonicwake V2">
+        <div class="f-lbl">Sonicwake V2 · Deep-V</div>
+      </div>
+      <div class="f-item f-2">
+        <img src="img/rocket_v2_1775857599473.png" alt="Rocket V2">
+        <div class="f-lbl">Rocket V2 · Brushless</div>
+      </div>
+      <div class="f-item f-3">
+        <img src="img/traxxas_spartan_sr_1775857541261.png" alt="Traxxas Spartan SR">
+        <div class="f-lbl">Spartan SR · 80+ km/h</div>
+      </div>
+      <div class="fleet-text">
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ECONOMICS -->
+  <section id="tokenomics" class="premium-section">
+    <h2><em>Engine</em> Tokenomics</h2>
+    <p style="max-width: 600px;">The $VOID token is the lifeblood connecting pilots, spectators, and data buyers. It
+      powers the ecosystem sustainably through utility, not speculation.</p>
+
+    <div class="tok-flex">
+      <div class="tok-stat">
+        <div class="tok-val">1B</div>
+        <span class="tok-lbl">Total Supply</span>
+      </div>
+      <div class="tok-stat">
+        <div class="tok-val">40%</div>
+        <span class="tok-lbl">Race Yield</span>
+      </div>
+      <div class="tok-stat">
+        <div class="tok-val">BASE</div>
+        <span class="tok-lbl">Network Layer</span>
+      </div>
+    </div>
+  </section>
+
+
+  <footer>
+    © 2026 VoidYacht Protocol — Elevating Physical Velocity
+  </footer>
+
+  <script>
+    // ─── 3D BOOK LOGIC (HOW IT WORKS) ───
+    let stepIndex = 0;
+    const steps = document.querySelectorAll('.step-page');
+    const indicator = document.getElementById('step-indicator');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+
+    function renderSteps() {
+      steps.forEach((s, i) => {
+        s.className = 'step-page'; // reset
+        if (i === stepIndex) {
+          s.classList.add('active');
+        } else if (i < stepIndex) {
+          s.classList.add('past');
+        } else if (i === stepIndex + 1) {
+          s.classList.add('next');
+        } else {
+          s.classList.add('future');
+        }
+      });
+      indicator.textContent = `0${stepIndex + 1} / 0${steps.length}`;
+      btnPrev.disabled = stepIndex === 0;
+      btnNext.disabled = stepIndex === steps.length - 1;
+    }
+
+    function flipAct(dir) {
+      if (dir === 1 && stepIndex < steps.length - 1) stepIndex++;
+      else if (dir === -1 && stepIndex > 0) stepIndex--;
+      renderSteps();
+    }
+
+    function flipStep(i) {
+      if (i > stepIndex) {
+        stepIndex = i;
+        renderSteps();
+      }
+    }
+
+    renderSteps();
+
+    // ── Full-Page Overlay ──
+    const burger = document.getElementById('burger-main');
+    const overlay = document.getElementById('fullnav-overlay');
+    const fnTheme = document.getElementById('fn-theme-btn');
+
+    burger.addEventListener('click', () => {
+      const open = overlay.classList.toggle('open');
+      burger.classList.toggle('open', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+
+    // Close overlay when a link inside it is clicked
+    overlay.querySelectorAll('.nav-item').forEach(link => {
+      link.addEventListener('click', () => {
+        overlay.classList.remove('open');
+        burger.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    });
+
+    fnTheme.addEventListener('click', () => {
+      const root = document.documentElement;
+      root.getAttribute('data-theme') === 'light' ? root.removeAttribute('data-theme') : root.setAttribute('data-theme', 'light');
+      document.querySelectorAll('nav').forEach(n => {
+        n.style.background = root.getAttribute('data-theme') === 'light'
+          ? 'rgba(247,244,238,0.85)' : 'rgba(6,26,36,0.75)';
+      });
+    });
+
+    // ── Loader ──
+    document.body.classList.add("loading");
+    const lc = document.getElementById("loader-content");
+    const ll = document.getElementById("loader-line");
+    setTimeout(() => {
+      if (lc) lc.style.opacity = '1';
+      setTimeout(() => {
+        if (ll) ll.style.width = '100%';
+        setTimeout(() => {
+          document.body.classList.remove("loading");
+          document.body.classList.add("loaded");
+          // Fully remove loader from layout after animation
+          setTimeout(() => {
+            const loaderEl = document.getElementById('loader');
+            if (loaderEl) { loaderEl.style.display = 'none'; }
+          }, 800);
+        }, 600);
+      }, 200);
+    }, 50);
+
+    document.querySelectorAll('a[href]').forEach(a => {
+      a.addEventListener('click', e => {
+        try {
+          const tgt = new URL(a.href, window.location.href);
+          if (tgt.hostname === window.location.hostname && tgt.pathname !== window.location.pathname && !a.hasAttribute('target')) {
+            e.preventDefault();
+            document.body.classList.remove('loaded');
+            document.body.classList.add('navigating');
+            setTimeout(() => { window.location.href = a.href; }, 700);
+          }
+        } catch (err) { }
+      });
+    });
+  </script>
+</body>
+
+</html>
