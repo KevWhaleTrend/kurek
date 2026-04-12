@@ -1168,6 +1168,9 @@
                 grid-template-columns: repeat(3, 1fr);
                 gap: 1.25rem;
             }
+            .fleet-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         @media (max-width: 768px) {
@@ -1184,6 +1187,10 @@
                 max-width: 420px;
                 margin-left: auto;
                 margin-right: auto;
+            }
+
+            .fleet-grid {
+                grid-template-columns: 1fr;
             }
 
             .telemetry-grid {
@@ -1400,3 +1407,14 @@
                         opacity: 0.3;
                     }
                 }
+
+@media (max-width: 1024px) {
+    .fleet-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+@media (max-width: 768px) {
+    .fleet-grid {
+        grid-template-columns: 1fr !important;
+    }
+}

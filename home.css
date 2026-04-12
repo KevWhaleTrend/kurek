@@ -64,10 +64,36 @@ body {
 .home-hero-content {
     position: relative;
     z-index: 2;
-    max-width: 1000px;
+    max-width: 1400px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4vw;
+}
+
+.home-hero-text-side {
+    flex: 1;
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.home-hero-video-side {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
     align-items: center;
+}
+
+.hero-video-iframe {
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
 }
 
 .badge-glow-wrap {
@@ -353,6 +379,22 @@ body {
 
 /* ── RESPONSIVE ── */
 @media (max-width: 1024px) {
+    .home-hero-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 3rem;
+    }
+    
+    .home-hero-text-side {
+        align-items: center;
+        text-align: center;
+    }
+
+    .home-hero-video-side {
+        justify-content: center;
+        width: 100%;
+    }
+
     .hiw-layout {
         flex-direction: column;
         text-align: center;
@@ -371,5 +413,44 @@ body {
     .home-step-controls {
         left: 50%;
         transform: translateX(-50%);
+    }
+}
+
+@media (max-width: 768px) {
+    .home-book-page {
+        padding: 40px 25px;
+    }
+
+    .home-book-page h3 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+
+    .home-book-page p {
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    .page-num {
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+    }
+
+    .home-book-container {
+        height: 520px;
+        max-width: 90vw;
+        margin: 0 auto;
+    }
+
+    .home-book-page.page-next {
+        transform: rotateY(0deg) translateZ(-20px) translateX(15px);
+    }
+
+    .home-book-page.page-future {
+        transform: rotateY(0deg) translateZ(-40px) translateX(30px);
+    }
+    
+    .home-book-page.page-past {
+        transform: rotateY(-100deg) translateZ(30px);
     }
 }
