@@ -66,6 +66,14 @@
     });
   });
 
-
+  /* ── 5. MOBILE MENU ── */
+  const burger = document.getElementById('vy-burger');
+  const navLinks = document.querySelector('.vy-nav-links');
+  if (burger && navLinks) {
+    burger.addEventListener('click', () => {
+      burger.classList.toggle('open');
+      navLinks.classList.toggle('nav-open');
+    });
+  }
 
 })();
