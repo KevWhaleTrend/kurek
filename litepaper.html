@@ -16,6 +16,42 @@
   <link rel="stylesheet" href="shared.css" />
 
   <link rel="stylesheet" href="litepaper.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+      tailwind.config = {
+          corePlugins: {
+              preflight: false,
+          },
+          theme: {
+              extend: {
+                  colors: {
+                      primary: '#00C4A1',
+                      secondary: '#00FFC8',
+                  },
+              }
+          }
+      }
+  </script>
+  <style>
+      .vy-buy-btn-wrap {
+          padding: 8px 20px;
+          border-radius: 50px;
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(0, 196, 161, 0.4);
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-decoration: none;
+      }
+
+      .vy-buy-btn-wrap:hover {
+          background: rgba(0, 196, 161, 0.15);
+          border-color: var(--accent);
+          box-shadow: 0 0 20px rgba(0, 196, 161, 0.3);
+          transform: translateY(-1px);
+      }
+  </style>
 </head>
 
 <body>
@@ -48,6 +84,9 @@
       <span></span>
     </button>
     <div class="vy-nav-right">
+      <a href="https://app.virtuals.io/virtuals/71998" target="_blank" rel="noopener" class="vy-buy-btn-wrap">
+        <span class="relative z-10 text-[13px] font-black text-white uppercase tracking-wider">BUY $VOID</span>
+      </a>
       <a href="https://x.com/Void_Yacht" target="_blank" rel="noopener" class="vy-nav-social" title="Follow on X"
         aria-label="X">
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
@@ -55,10 +94,7 @@
             d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
         </svg>
       </a>
-      <a href="https://app.virtuals.io" target="_blank" rel="noopener" class="vy-nav-social" title="Virtuals Protocol"
-        aria-label="Virtuals">
-        <img src="IMG/virtuals.png" alt="Virtuals" class="vy-nav-virtuals-img" />
-      </a>
+
     </div>
   </nav>
 
@@ -538,7 +574,7 @@
             d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
         </svg>
       </a>
-      <a href="https://app.virtuals.io" target="_blank" rel="noopener" class="footer-social-link"
+      <a href="https://app.virtuals.io/virtuals/71998" target="_blank" rel="noopener" class="footer-social-link"
         title="Virtuals Protocol">
         <img src="IMG/virtuals.png" alt="Virtuals Protocol" />
       </a>
